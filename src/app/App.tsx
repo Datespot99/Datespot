@@ -823,7 +823,7 @@ function StickyCTA({ onJoin }: { onJoin: () => void }) {
             <div className="relative flex items-center justify-center gap-3 py-3.5 px-6">
               <span className="font-black text-white text-sm tracking-tight">Join Datespot</span>
               <span className="text-white/40 text-[11px] line-through font-semibold">₹999</span>
-              <span className="font-black text-white text-sm">₹599</span>
+              <span className="font-black text-white text-sm">₹199</span>
               <ArrowRight className="w-4 h-4 text-white" />
             </div>
           </motion.button>
@@ -953,7 +953,7 @@ function MobileApp() {
               {/* Price */}
               <div className="flex items-baseline gap-2 justify-center">
                 <span className="text-sm line-through font-semibold" style={{ color: T.MUTED }}>₹999</span>
-                <span className="font-black text-4xl leading-none" style={{ color: B2 }}>₹599</span>
+                <span className="font-black text-4xl leading-none" style={{ color: B2 }}>₹199</span>
               </div>
 
               {/* CTA Button */}
@@ -1203,7 +1203,7 @@ function DesktopVersion({ onOpenPayment, showPayment, onClosePayment, paymentTyp
             <h2 className="font-extrabold mb-2" style={{ color: T.DARK, fontSize: 40, letterSpacing: '-0.03em' }}>Ready to Join?</h2>
             <div className="flex items-baseline gap-2 justify-center mb-6">
               <span className="text-lg line-through font-semibold" style={{ color: T.MUTED }}>₹999</span>
-              <span className="font-black" style={{ fontSize: 48, color: B2, lineHeight: 1 }}>₹599</span>
+              <span className="font-black" style={{ fontSize: 48, color: B2, lineHeight: 1 }}>₹199</span>
             </div>
             <button onClick={() => onOpenPayment('full')}
               className="rounded-2xl font-black text-white text-lg flex items-center gap-3 mx-auto relative overflow-hidden transition-all hover:scale-105 mb-4"
@@ -1405,9 +1405,9 @@ type UploadState = 'idle' | 'verifying' | 'success';
 
 function PaymentModal({ onClose, paymentType }: { onClose: () => void; paymentType: 'full' | 'demo' }) {
   const UPI_ID        = 'paytm.s36oa7e@pty';
-  const AMOUNT        = '599';
+  const AMOUNT        = '199';
   const ORIGINAL_AMT  = '999';
-  const WHATSAPP_LINK = 'https://t.me/+wHPA3hSr4c85ZWY1';
+  const WHATSAPP_LINK = 'https://t.me/+hQQOmYENgQ00ZjBl';
   const upiUrl        = `upi://pay?pa=${UPI_ID}&pn=Datespot&am=${AMOUNT}&cu=INR`;
 
   const [uploadState, setUploadState] = useState<UploadState>('idle');
