@@ -252,7 +252,7 @@ function GroupPreviewSlider({ images, mobile = false }: { images: string[]; mobi
 }
 
 // ─── Lead Gate ────────────────────────────────────────────────────────────────
-const SHEET_URL = 'https://script.google.com/macros/s/AKfycby5yLNtWOTeTx1qI0Qv_-hiFri1UAn3Th4VzdaW4gDSKYNjPFftUWtKqiGaEGzfW4LC2g/exec';
+const SHEET_URL = 'https://script.google.com/macros/s/AKfycbxa5NsmcVu1jT6KFladpJL12TzQNXVs1e5UICV3_uV21UCIfK53KcjiYNw4ZsDNemXDpQ/exec';
 
 function LeadGate({ onUnlock }: { onUnlock: () => void }) {
   const [step, setStep]       = useState<1 | 2>(1);
