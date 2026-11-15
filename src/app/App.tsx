@@ -1,5 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { SHEET_URL, SlotsProvider, useSlots, waitForScreenshotReceipt } from './slots';
+
+// Lead-only Apps Script endpoint. Screenshot/slot backend remains disconnected.
+const LEADS_URL = 'https://script.google.com/macros/s/AKfycbz_tLVlDU-Vsgu2xQtBtpdfpzXYukEdalfGFRWXQ4d1TUkC4Lk8kUSox0F0jOCWHLNzbw/exec';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   Play, Pause, Users, X, Star, Mic, Upload, CheckCircle, Loader2,
@@ -294,11 +297,11 @@ function LeadModal({ onClose, onComplete, gate = false }: { onClose?: () => void
     setError('');
     if (!name.trim()) { setError('Please enter your full name.'); return; }
     if (!/^[6-9]\d{9}$/.test(phone.trim())) { setError('Enter a valid 10-digit Indian mobile number.'); return; }
-    if (!SHEET_URL) { setError('Registration is temporarily unavailable. Please try again later.'); return; }
+    if (!LEADS_URL) { setError('Registration is temporarily unavailable. Please try again later.'); return; }
     setLoading(true);
     try {
       const params = new URLSearchParams({ name: name.trim(), phone: phone.trim() });
-      await fetch(`${SHEET_URL}?${params.toString()}`, { mode: 'no-cors' });
+      await fetch(`${LEADS_URL}?${params.toString()}`, { mode: 'no-cors' });
       localStorage.setItem('ds_lead_submitted', '1');
       localStorage.setItem('ds_lead_name', name.trim());
       localStorage.setItem('ds_lead_phone', phone.trim());
