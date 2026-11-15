@@ -562,6 +562,8 @@ function TrustProof() {
   const dragStart = useRef(0);
 
   const proofCards = [
+    { img: proofPayment, label: 'Payment Confirmed', emoji: '✅', color: '#10B981',
+      review: REVIEWS[0] },
     { img: proofReview1, label: 'Member Review',     emoji: '⭐', color: '#F59E0B',
       review: REVIEWS[2] },
     { img: proofReview2, label: 'Community Active',  emoji: '💬', color: B1,
@@ -605,14 +607,14 @@ function TrustProof() {
           <motion.div key={current} custom={direction} variants={variants}
             initial="enter" animate="center" exit="exit"
             transition={{ duration: 0.28, ease: [0.4, 0, 0.2, 1] }}
-            className="w-full min-h-[205px] sm:min-h-[230px] rounded-2xl overflow-hidden flex items-center gap-3 sm:gap-6 p-3 sm:p-5"
+            className="w-full rounded-2xl overflow-hidden flex items-center gap-3 sm:gap-6 p-3 sm:p-5"
             style={{ background: T.CARD_BG, border: '1px solid rgba(105,86,244,.18)', boxShadow: T.isDark ? 'none' : '0 4px 18px rgba(50,40,120,.06)' }}>
 
             {/* Screenshot spotlight: original evidence, without a phone frame or crop. */}
-            <div className="w-[47%] sm:w-[49%] h-[170px] sm:h-[195px] shrink-0 flex items-center justify-center rounded-2xl p-1.5 sm:p-2"
+            <div className="w-[47%] sm:w-[49%] shrink-0 flex items-center justify-center rounded-2xl p-1.5 sm:p-2"
               style={{ background: T.isDark ? 'rgba(255,255,255,.05)' : '#FAF9FF', border: '1px solid rgba(105,86,244,.13)' }}>
               <img src={c.img} alt={c.label} loading="lazy"
-                className="block w-full h-full object-contain rounded-xl"
+                className="block w-full h-auto max-h-[220px] sm:max-h-[250px] object-contain rounded-xl"
                 style={{ filter: 'drop-shadow(0 4px 10px rgba(30,20,90,.10))' }} />
             </div>
 
@@ -684,12 +686,9 @@ function FAQ() {
           <p className="text-[11px] mt-1" style={{ color: T.MUTED }}>Message the admin on Telegram: @subhash8055g</p>
         </div>
         <a href="https://t.me/subhash8055g" target="_blank" rel="noopener noreferrer"
-          aria-label="Chat with Datespot support on Telegram before joining"
-          className="group inline-flex items-center justify-between gap-3 px-4 py-3.5 rounded-2xl text-white text-sm font-extrabold shrink-0 w-full sm:w-auto shadow-lg transition-transform active:scale-[0.98] hover:-translate-y-0.5"
-          style={{ background: 'linear-gradient(110deg, #149DDD 0%, #1944F1 90%)', boxShadow: '0 6px 18px rgba(25,68,241,.20)' }}>
-          <span className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-white/20 shrink-0"><Send className="w-5 h-5" /></span>
-          <span className="flex-1 text-left leading-tight">Chat on Telegram<span className="block text-[10px] font-medium text-white/85 mt-0.5">Ask before you join</span></span>
-          <ArrowRight className="w-4 h-4 shrink-0 transition-transform group-hover:translate-x-1" />
+          className="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-white text-xs font-extrabold shrink-0"
+          style={{ background: B1 }}>
+          <Send className="w-4 h-4" /> Contact Telegram Support <ExternalLink className="w-3 h-3" />
         </a>
       </div>
     </section>
@@ -865,11 +864,11 @@ function MobileApp() {
         {/* Reviews slider */}
         <ReviewsStrip />
 
-        {/* Member proof appears before FAQs on mobile. */}
-        <TrustProof />
-
         {/* FAQ */}
         <FAQ />
+
+        {/* Trust Proof — below payment section */}
+        <TrustProof />
 
       </div>
 
@@ -1549,7 +1548,7 @@ function PaymentModal({ onClose, paymentType, device }: { onClose: () => void; p
       <motion.div
         initial={{ scale: 0.9, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0 }}
         transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-        className="relative w-full max-w-md max-h-[88dvh] overflow-y-auto rounded-2xl shadow-2xl bg-white">
+        className="relative w-full max-w-md max-h-[92dvh] overflow-y-auto rounded-3xl shadow-2xl bg-white">
         {uploadState === 'idle' && (
           <button onClick={onClose} className="absolute top-4 right-4 p-2 rounded-full z-20 hover:bg-gray-100 transition-colors">
             <X className="w-4 h-4 text-gray-400" />
@@ -1557,9 +1556,9 @@ function PaymentModal({ onClose, paymentType, device }: { onClose: () => void; p
         )}
 
         {/* Header */}
-        <div className="px-4 pt-3 pb-2 flex items-center gap-2.5">
+        <div className="px-4 pt-4 pb-3 flex items-center gap-2.5">
           <img src="/datespot-logo.svg" alt="Datespot logo"
-            className="w-8 h-8 rounded-lg shrink-0 object-cover" />
+            className="w-10 h-10 rounded-xl shrink-0 object-cover" />
           <div className="flex-1 min-w-0">
             <div className="font-bold text-sm leading-none text-gray-900">Join Datespot</div>
             <div className="text-[10px] mt-0.5 font-medium text-gray-400">Lifetime access · Telegram</div>
@@ -1570,11 +1569,11 @@ function PaymentModal({ onClose, paymentType, device }: { onClose: () => void; p
           </div>
         </div>
 
-        <div className="px-4 pb-3">
+        <div className="px-4 pb-4">
           {uploadState === 'idle' && (
             <>
               {/* Neutral payment details; no discount or sale expiry claims. */}
-              <div className="flex items-center justify-between gap-2 px-3 py-1.5 rounded-xl mb-2" style={{ background: '#EEF2FF', border: '1px solid #D6DFFF' }}>
+              <div className="flex items-center justify-between gap-2 px-3 py-2 rounded-xl mb-3" style={{ background: '#EEF2FF', border: '1px solid #D6DFFF' }}>
                 <div className="flex items-center gap-2 min-w-0">
                   <CreditCard className="w-3.5 h-3.5 shrink-0" style={{ color: B1 }} />
                   <p className="text-[10px] font-black uppercase tracking-wide" style={{ color: B1 }}>Secure UPI Payment</p>
@@ -1583,10 +1582,10 @@ function PaymentModal({ onClose, paymentType, device }: { onClose: () => void; p
                   className="text-[12px] font-extrabold tabular-nums rounded-md px-2 py-1 shrink-0"
                   style={{ background: '#FFFFFF', border: '1px solid #D6DFFF', color: '#475569' }}>{countdown}</span>
               </div>
-              <div className="flex rounded-xl p-1 mb-2" style={{ background: '#F1F4FA' }}>
+              <div className="flex rounded-xl p-1 mb-3" style={{ background: '#F1F4FA' }}>
                 {(['qr', 'upi'] as const).map(t => (
                   <button key={t} onClick={() => setTab(t)}
-                    className="flex-1 py-1.5 rounded-xl text-xs font-bold transition-all"
+                    className="flex-1 py-2 rounded-xl text-xs font-bold transition-all"
                     style={tab === t ? { background: B1, color: '#FFFFFF' } : { background: 'transparent', color: '#64748B' }}>
                     {t === 'qr' ? 'Scan QR' : 'UPI ID'}
                   </button>
@@ -1596,10 +1595,10 @@ function PaymentModal({ onClose, paymentType, device }: { onClose: () => void; p
               <AnimatePresence mode="wait">
                 {tab === 'qr' ? (
                   <motion.div key="qr" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                    <div className="rounded-xl p-2 mb-1 flex items-center justify-center" style={{ background: '#F8FAFC' }}>
-                      <QRCodeSVG value={upiUrl} size={132} level="H" />
+                    <div className="rounded-2xl p-3 mb-2 flex items-center justify-center" style={{ background: '#F8FAFC' }}>
+                      <QRCodeSVG value={upiUrl} size={148} level="H" />
                     </div>
-                    <p className="text-center text-[10px] mb-1 font-medium" style={{ color: "#475569" }}>Scan with any UPI app</p>
+                    <p className="text-center text-[10px] mb-2 font-medium" style={{ color: "#475569" }}>Scan with any UPI app</p>
                   </motion.div>
                 ) : (
                   <motion.div key="upi" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="mb-3">
@@ -1625,20 +1624,20 @@ function PaymentModal({ onClose, paymentType, device }: { onClose: () => void; p
               </AnimatePresence>
 
               {/* UPI apps accepted: reference image */}
-              <div className="rounded-lg px-2 py-1 mb-1 max-w-[170px] mx-auto" style={{ background: '#FFFFFF', border: '1px solid #E2E8F0' }}>
+              <div className="rounded-lg px-2 py-1 mb-2 max-w-[220px] mx-auto" style={{ background: '#FFFFFF', border: '1px solid #E2E8F0' }}>
                 <img
                   src="/upi-apps-accepted.webp"
                   alt="UPI, Paytm, Google Pay and PhonePe accepted"
-                  className="block w-full h-auto max-h-[48px] object-contain mx-auto rounded-md"
+                  className="block w-full h-auto max-h-[90px] object-contain mx-auto rounded-md"
                   loading="lazy"
                 />
               </div>
 
-              <div className="pt-2 mt-1" style={{ borderTop: `1px solid ${B1}12` }}>
+              <div className="pt-3 mt-1" style={{ borderTop: `1px solid ${B1}12` }}>
                 <p className="text-center text-[10px] mb-2 font-medium" style={{ color: "#475569" }}>Upload screenshot to verify payment</p>
                 <input type="file" id="ss-upload" className="hidden" accept="image/*" onChange={handleFileChange} />
                 <label htmlFor="ss-upload"
-                  className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-white font-bold text-sm cursor-pointer active:scale-95 transition-transform"
+                  className="flex items-center justify-center gap-2 w-full py-3.5 rounded-2xl text-white font-bold text-sm cursor-pointer active:scale-95 transition-transform"
                   style={{ background: B1 }}>
                   <Upload className="w-4 h-4" /> Upload Screenshot
                 </label>
