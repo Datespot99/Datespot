@@ -645,16 +645,53 @@ function TrustProof() {
 // ─── FAQ ──────────────────────────────────────────────────────────────────────
 function FAQ() {
   const T = useT();
-  const [open, setOpen] = useState<number | null>(null);
+  const [open, setOpen] = useState<number | null>(0);
   const items = [
-    { q: 'Is this genuine?', a: 'Yes. Datespot has been running since 2021 with 548+ verified members. Every member is manually approved by Subhash Gowda before getting access.' },
-    { q: 'How do I get access?', a: `Pay ${formatPrice(PRICING.mobile.amount)} via UPI, upload the payment screenshot, and you receive the Telegram group link instantly. The whole process takes under 2 minutes.` },
-    { q: 'Are profiles verified?', a: 'Every profile is manually verified by the admin. Fake profiles, bots, and spam accounts are removed immediately — zero tolerance policy.' },
-    { q: 'Is my privacy protected?', a: 'Absolutely. Your personal details are never shared with other members. The group has strict privacy rules and all screenshots of members are prohibited.' },
-    { q: 'How quickly do I receive access?', a: 'Access is sent within minutes of payment confirmation, typically under 5 minutes. Admin support is available daily for any delays.' },
+    { q: 'Is Datespot genuine?', a: 'Datespot is a Telegram-based dating community. Before joining, you can contact the admin directly on Telegram to ask questions about membership and access.' },
+    { q: 'Can I speak to someone before paying?', a: 'Yes. Message @subhash8055g on Telegram before making any payment. Ask about the community, membership process, and what is included.' },
+    { q: 'How does joining work?', a: 'Enter your name and phone number, review the membership details and payment instructions, and submit your payment screenshot. Contact support if you need help with access.' },
+    { q: 'Are members verified?', a: 'Datespot uses admin-led membership review. Ask support about the current verification process; no online community can guarantee that every member is genuine.' },
+    { q: 'What if I pay but cannot access the group?', a: 'Contact @subhash8055g with your payment reference or screenshot so the admin can review your access issue. Do not share OTPs, passwords, or banking credentials.' },
+    { q: 'Is my phone number private?', a: 'Your registration details are collected to process your request. Before signing up, you can ask the admin how your information is stored, used, and retained.' },
+    { q: 'Is the membership fee refundable?', a: 'Please confirm the current refund terms with support before paying. Do not assume that a payment is refundable unless the terms explicitly say so.' },
   ];
+
   return (
-    null
+    <section className="py-5" aria-labelledby="trust-faq-heading">
+      <div className="mb-3">
+        <h2 id="trust-faq-heading" className="text-lg font-extrabold" style={{ color: T.DARK }}>Questions Before You Join?</h2>
+        <p className="text-[11px] mt-1 font-medium" style={{ color: T.MUTED }}>Clear answers, and a real person to contact before paying.</p>
+      </div>
+      <div className="rounded-2xl overflow-hidden" style={{ background: T.CARD_BG, border: '1px solid rgba(25,68,241,.18)' }}>
+        {items.map((item, i) => (
+          <div key={item.q} style={{ borderBottom: i === items.length - 1 ? 'none' : '1px solid rgba(125,130,170,.14)' }}>
+            <button type="button" className="w-full flex items-center justify-between gap-3 text-left px-4 py-3.5"
+              aria-expanded={open === i} aria-controls={`trust-faq-answer-${i}`}
+              onClick={() => setOpen(open === i ? null : i)}>
+              <span className="text-[12px] sm:text-sm font-bold" style={{ color: T.DARK }}>{item.q}</span>
+              <ChevronDown className={`w-4 h-4 shrink-0 transition-transform ${open === i ? 'rotate-180' : ''}`} style={{ color: B1 }} />
+            </button>
+            {open === i && (
+              <div id={`trust-faq-answer-${i}`} className="px-4 pb-4 text-[11.5px] sm:text-xs leading-relaxed" style={{ color: T.MUTED }}>
+                {item.a}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+      <div className="mt-3 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+        style={{ background: T.isDark ? 'rgba(25,68,241,.10)' : '#F1F4FF', border: '1px solid rgba(25,68,241,.16)' }}>
+        <div>
+          <p className="text-[13px] font-extrabold" style={{ color: T.DARK }}>Need help before joining?</p>
+          <p className="text-[11px] mt-1" style={{ color: T.MUTED }}>Message the admin on Telegram: @subhash8055g</p>
+        </div>
+        <a href="https://t.me/subhash8055g" target="_blank" rel="noopener noreferrer"
+          className="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-white text-xs font-extrabold shrink-0"
+          style={{ background: B1 }}>
+          <Send className="w-4 h-4" /> Contact Telegram Support <ExternalLink className="w-3 h-3" />
+        </a>
+      </div>
+    </section>
   );
 }
 
