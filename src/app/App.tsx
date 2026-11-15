@@ -679,7 +679,7 @@ function FAQ() {
           </div>
         ))}
       </div>
-      <div className="mt-3 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+      <div id="telegram-support" className="mt-3 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
         style={{ background: T.isDark ? 'rgba(25,68,241,.10)' : '#F1F4FF', border: '1px solid rgba(25,68,241,.16)' }}>
         <div>
           <p className="text-[13px] font-extrabold" style={{ color: T.DARK }}>Need help before joining?</p>
@@ -719,9 +719,20 @@ function StickyCTA({ onJoin }: { onJoin: () => void }) {
   const T = useT();
   const [visible, setVisible] = useState(false);
   useEffect(() => {
-    const onScroll = () => setVisible(window.scrollY > 300);
+    const onScroll = () => {
+      const support = document.getElementById('telegram-support');
+      const rect = support?.getBoundingClientRect();
+      // Hide the sticky join CTA while the Telegram support card is on screen.
+      const supportVisible = !!rect && rect.top < window.innerHeight - 90 && rect.bottom > 0;
+      setVisible(window.scrollY > 300 && !supportVisible);
+    };
+    onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
+    window.addEventListener('resize', onScroll);
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+    };
   }, []);
   return (
     <AnimatePresence>
