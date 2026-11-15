@@ -1479,76 +1479,6 @@ function PaymentModal({ onClose, paymentType, device }: { onClose: () => void; p
   }, [secondsLeft, uploadState]);
   const countdown = `${String(Math.floor(secondsLeft / 60)).padStart(2, '0')}:${String(secondsLeft % 60).padStart(2, '0')}`;
 
-  const compressImage = (file: File): Promise<string> =>
-    new Promise((resolve, reject) => {
-      const img = new Image();
-      const url = URL.createObjectURL(file);
-      img.onload = () => {
-        try {
-          const MAX = 900;
-          const scale = Math.min(1, MAX / Math.max(img.width, img.height));
-          const canvas = document.createElement('canvas');
-          canvas.width  = Math.round(img.width * scale);
-          canvas.height = Math.round(img.height * scale);
-          const ctx = canvas.getContext('2d');
-          if (!ctx) throw new Error('Could not process screenshot');
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-          resolve(canvas.toDataURL('image/jpeg', 0.75).split(',')[1]);
-        } catch (error) {
-          reject(error);
-        } finally {
-          URL.revokeObjectURL(url);
-        }
-      };
-      img.onerror = () => {
-        URL.revokeObjectURL(url);
-        reject(new Error('Invalid screenshot image. Please choose another file.'));
-      };
-      img.src = url;
-    });
-
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (!SHEET_URL) { toast.error('Payment uploads are temporarily unavailable.'); return; }
-    // Allow choosing the same screenshot again after a failed attempt.
-    e.target.value = '';
-    setUploadState('verifying');
-    toast('Uploading screenshot...');
-
-    try {
-      const base64 = await compressImage(file);
-      const name  = localStorage.getItem('ds_lead_name')  ?? '';
-      const phone = localStorage.getItem('ds_lead_phone') ?? '';
-      const uploadId = window.crypto.randomUUID();
-      await fetch(SHEET_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'text/plain' },
-        body: JSON.stringify({ action: 'screenshot', uploadId, name, phone, mimeType: 'image/jpeg', fileName: `payment_${Date.now()}.jpg`, image: base64 }),
-      });
-
-      // When the updated Apps Script is deployed, its receipt status confirms
-      // Drive save + sheet link before any frontend success is displayed.
-      // The server alone deducts the slot; clients never decrement locally.
-      // A no-cors POST does not prove the server saved the screenshot.
-      // Always require a server receipt before showing success.
-      const remaining = await waitForScreenshotReceipt(uploadId);
-      setConfirmedSlots(remaining);
-    } catch (error) {
-      setUploadState('idle');
-      toast.error(error instanceof Error ? error.message : 'Screenshot upload failed. Please try again.');
-      return;
-    }
-
-    // Screenshots are received for review, not proof of verified payment.
-    setTimeout(() => {
-      setUploadState('success');
-      toast.success('Screenshot sent for review.');
-      confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 }, colors: [B1, B2, '#fff', '#FF6B6B'] });
-      setTimeout(() => window.open(TELEGRAM_LINK, '_blank'), 1200);
-    }, 2500);
-  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-lg p-4">
@@ -1642,38 +1572,17 @@ function PaymentModal({ onClose, paymentType, device }: { onClose: () => void; p
               </div>
 
               <div className="pt-2 mt-1" style={{ borderTop: `1px solid ${B1}12` }}>
-                <p className="text-center text-[10px] mb-2 font-medium" style={{ color: "#475569" }}>Upload screenshot to verify payment</p>
-                <input type="file" id="ss-upload" className="hidden" accept="image/*" onChange={handleFileChange} />
-                <label htmlFor="ss-upload"
-                  className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-white font-bold text-sm cursor-pointer active:scale-95 transition-transform"
+                <p className="text-center text-[10px] mb-2 font-medium" style={{ color: "#475569" }}>Paid already? Send your payment screenshot directly to the admin on Telegram for review.</p>
+                <a href="https://t.me/subhash8055g" target="_blank" rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-white font-bold text-sm active:scale-95 transition-transform"
                   style={{ background: B1 }}>
-                  <Upload className="w-4 h-4" /> Upload Screenshot
-                </label>
+                  <Send className="w-4 h-4" /> Send Screenshot on Telegram <ExternalLink className="w-3.5 h-3.5" />
+                </a>
               </div>
             </>
           )}
 
-          {uploadState === 'verifying' && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-8">
-              <div className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: `${B1}12` }}>
-                <Loader2 className="w-8 h-8 animate-spin" style={{ color: B1 }} />
-              </div>
-              <p className="font-bold text-base mb-1 text-gray-900">Uploading Screenshot</p>
-              <p className="text-xs font-medium text-gray-400">Please wait a moment...</p>
-            </motion.div>
-          )}
 
-          {uploadState === 'success' && (
-            <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
-              transition={{ type: 'spring', stiffness: 200 }}
-              className="text-center py-8">
-              <div className="w-18 h-18 mx-auto rounded-2xl flex items-center justify-center mb-5 shadow-xl" style={{ background: HERO_GRAD, width: 72, height: 72 }}>
-                <CheckCircle className="w-10 h-10 text-white" />
-              </div>
-              <p className="font-bold text-xl mb-1 text-gray-900">Screenshot Submitted</p>
-              <p className="text-sm font-medium" style={{ color: B1 }}>Redirecting to Telegram...</p>
-            </motion.div>
-          )}
         </div>
       </motion.div>
     </div>
