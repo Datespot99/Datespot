@@ -969,8 +969,26 @@ function DesktopHero() {
     setPreviewIndex(index => (index + offset + IMAGES.length) % IMAGES.length);
 
   return (
-    <section className="max-w-7xl mx-auto px-8 lg:px-12 pt-12 lg:pt-16 pb-5">
+    <section className="relative max-w-7xl mx-auto px-8 lg:px-12 xl:pl-[185px] pt-12 lg:pt-16 pb-5">
       <div className="grid grid-cols-2 gap-6 lg:gap-12 xl:gap-16 items-center">
+        {/* Desktop-only Karnataka outline; red/yellow are used only on the border. */}
+        <div className="hidden xl:flex items-center justify-center absolute left-[-100px] top-[8px] w-[170px] h-[330px] pointer-events-none" aria-hidden="true">
+          <svg viewBox="0 0 270 440" className="w-full h-full" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="karnatakaBorder" x1="110" y1="0" x2="130" y2="440" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stopColor="#F7D000" />
+                <stop offset="52%" stopColor="#F7D000" />
+                <stop offset="53%" stopColor="#E31B23" />
+                <stop offset="100%" stopColor="#E31B23" />
+              </linearGradient>
+            </defs>
+            <path d="M183 12 L192 24 L188 39 L202 47 L198 60 L206 74 L195 87 L199 104 L187 114 L190 131 L179 141 L181 158 L170 170 L174 189 L163 204 L170 219 L163 233 L172 250 L189 246 L203 257 L216 254 L227 269 L241 270 L248 287 L237 303 L224 309 L219 326 L202 332 L193 348 L176 351 L168 371 L149 379 L142 398 L121 405 L113 420 L94 414 L82 398 L65 391 L57 374 L43 369 L38 347 L27 335 L31 318 L21 301 L26 285 L19 269 L27 251 L18 235 L27 217 L24 199 L33 182 L28 165 L40 151 L37 134 L51 124 L48 110 L65 99 L76 102 L89 89 L105 94 L116 81 L134 79 L142 64 L158 61 L164 44 L176 40 L173 26 Z"
+              stroke="url(#karnatakaBorder)" strokeWidth="5.5" strokeLinejoin="round" strokeLinecap="round" />
+            <path d="M122 225c-14 0-25 11-25 25 0 19 25 43 25 43s25-24 25-43c0-14-11-25-25-25Z" fill="#6D28D9"/>
+            <circle cx="122" cy="250" r="8" fill="white"/>
+            <text x="122" y="322" textAnchor="middle" fill="currentColor" fontSize="22" fontWeight="700">Karnataka</text>
+          </svg>
+        </div>
         <div className="min-w-0">
           <div className="inline-flex items-center rounded-full px-4 py-2 text-xs font-extrabold uppercase tracking-widest mb-7"
             style={{ color: B1, background: T.isDark ? 'rgba(25,68,241,.13)' : '#FFFFFF', border: '1px solid rgba(25,68,241,.22)' }}>
