@@ -1478,6 +1478,32 @@ function PaymentModal({ onClose, paymentType, device }: { onClose: () => void; p
     return () => window.clearTimeout(id);
   }, [secondsLeft, uploadState]);
   const countdown = `${String(Math.floor(secondsLeft / 60)).padStart(2, '0')}:${String(secondsLeft % 60).padStart(2, '0')}`;
+  const redirectTimer = useRef<number | null>(null);
+  useEffect(() => () => { if (redirectTimer.current !== null) window.clearTimeout(redirectTimer.current); }, []);
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please choose an image screenshot.');
+      return;
+    }
+    // Local image check only: no upload, storage or payment verification.
+    setUploadState('verifying');
+    try {
+      await createImageBitmap(file).then(bitmap => bitmap.close());
+    } catch {
+      setUploadState('idle');
+      toast.error('Could not read this image. Please choose another screenshot.');
+      return;
+    }
+    redirectTimer.current = window.setTimeout(() => {
+      setUploadState('success');
+      // Navigate in the same tab to avoid popup blockers on mobile browsers.
+      redirectTimer.current = window.setTimeout(() => { window.location.assign(TELEGRAM_LINK); }, 350);
+    }, 1500);
+  };
 
 
   return (
@@ -1572,16 +1598,35 @@ function PaymentModal({ onClose, paymentType, device }: { onClose: () => void; p
               </div>
 
               <div className="pt-2 mt-1" style={{ borderTop: `1px solid ${B1}12` }}>
-                <p className="text-center text-[10px] mb-2 font-medium" style={{ color: "#475569" }}>Paid already? Send your payment screenshot directly to the admin on Telegram for review.</p>
-                <a href="https://t.me/subhash8055g" target="_blank" rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-white font-bold text-sm active:scale-95 transition-transform"
+                <p className="text-center text-[10px] mb-2 font-medium" style={{ color: '#475569' }}>Select your payment screenshot to continue. Payment will be reviewed separately.</p>
+                <input type="file" id="ss-upload" className="hidden" accept="image/*" onChange={handleFileChange} />
+                <label htmlFor="ss-upload"
+                  className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-white font-bold text-sm cursor-pointer active:scale-95 transition-transform"
                   style={{ background: B1 }}>
-                  <Send className="w-4 h-4" /> Send Screenshot on Telegram <ExternalLink className="w-3.5 h-3.5" />
-                </a>
+                  <Upload className="w-4 h-4" /> Select Payment Screenshot
+                </label>
               </div>
             </>
           )}
 
+          {uploadState === 'verifying' && (
+            <div className="text-center py-8" role="status">
+              <Loader2 className="w-9 h-9 animate-spin mx-auto mb-3" style={{ color: B1 }} />
+              <p className="font-bold text-gray-900">Checking screenshot...</p>
+              <p className="text-xs text-gray-500 mt-1">Preparing your Telegram invite</p>
+            </div>
+          )}
+          {uploadState === 'success' && (
+            <div className="text-center py-7" role="status">
+              <CheckCircle className="w-10 h-10 mx-auto mb-3" style={{ color: B1 }} />
+              <p className="font-bold text-gray-900">Opening Telegram group...</p>
+              <p className="text-xs text-gray-500 mt-1 mb-4">If Telegram doesn't open, use the button below.</p>
+              <a href={TELEGRAM_LINK} className="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-white font-bold text-sm" style={{ background: B1 }}>
+                <Send className="w-4 h-4" /> Open Telegram Group <ExternalLink className="w-3.5 h-3.5" />
+              </a>
+              <p className="text-[10px] text-gray-500 mt-3">Screenshot is not uploaded or stored. Payment is not automatically verified.</p>
+            </div>
+          )}
 
         </div>
       </motion.div>
