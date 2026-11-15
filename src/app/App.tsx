@@ -294,6 +294,7 @@ function LeadModal({ onClose, onComplete, gate = false }: { onClose?: () => void
     setError('');
     if (!name.trim()) { setError('Please enter your full name.'); return; }
     if (!/^[6-9]\d{9}$/.test(phone.trim())) { setError('Enter a valid 10-digit Indian mobile number.'); return; }
+    if (!SHEET_URL) { setError('Registration is temporarily unavailable. Please try again later.'); return; }
     setLoading(true);
     try {
       const params = new URLSearchParams({ name: name.trim(), phone: phone.trim() });
@@ -1536,6 +1537,7 @@ function PaymentModal({ onClose, paymentType, device }: { onClose: () => void; p
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    if (!SHEET_URL) { toast.error('Payment uploads are temporarily unavailable.'); return; }
     // Allow choosing the same screenshot again after a failed attempt.
     e.target.value = '';
     setUploadState('verifying');
