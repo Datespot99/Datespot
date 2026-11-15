@@ -969,10 +969,10 @@ function DesktopHero() {
     setPreviewIndex(index => (index + offset + IMAGES.length) % IMAGES.length);
 
   return (
-    <section className="relative max-w-7xl mx-auto px-8 lg:px-12 xl:pl-[185px] pt-12 lg:pt-16 pb-5">
+    <section className="relative max-w-7xl mx-auto px-8 lg:px-12 xl:pl-[205px] pt-12 lg:pt-16 pb-5">
       <div className="grid grid-cols-2 gap-6 lg:gap-12 xl:gap-16 items-center">
         {/* Desktop-only Karnataka outline; red/yellow are used only on the border. */}
-        <div className="hidden xl:flex items-center justify-center absolute left-[-100px] top-[8px] w-[170px] h-[330px] pointer-events-none" aria-hidden="true">
+        <div className="hidden xl:flex items-center justify-center absolute left-[10px] top-[75px] w-[175px] h-[330px] pointer-events-none" aria-hidden="true">
           <svg viewBox="0 0 270 440" className="w-full h-full" fill="none" xmlns="http://www.w3.org/2000/svg">
             <defs>
               <linearGradient id="karnatakaBorder" x1="110" y1="0" x2="130" y2="440" gradientUnits="userSpaceOnUse">
