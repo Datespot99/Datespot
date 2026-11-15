@@ -1,12 +1,12 @@
 /**
  * Datespot Deepavali registration and screenshot collection.
- * Private payment screenshots are stored in Drive and linked from column C.
+ * Private payment screenshots are stored in Drive and linked from column F.
  *
  * Deploy as Apps Script Web App: Execute as Me; Who has access: Anyone.
  * Run authorizeScreenshotStorage in the editor once to authorize Drive access.
  */
-const SPREADSHEET_ID = '1J0VGBnaFuIECasUjp5wqG_xa2ZThXXZ1RDbIqlgA4o4';
-const SHEET_NAME = 'Sheet1';
+// This Apps Script must be bound to the NEW Datespot Leads spreadsheet.
+const SHEET_NAME = 'Leads';
 const TIME_ZONE = 'Asia/Kolkata';
 const MAX_IMAGE_BYTES = 1900000;
 const INITIAL_SLOTS = 26;
@@ -40,10 +40,9 @@ function doGet(e) {
   try {
     const sheet = sheet_();
     const dateTime = Utilities.formatDate(new Date(), TIME_ZONE, 'dd-MM hh:mma');
-    sheet.appendRow([safe_(name), '', '', phone]);
-    const row = sheet.getLastRow();
-    sheet.getRange(row, 2).setNumberFormat('@').setValue(dateTime);
-    sheet.getRange(row, 1, 1, 3).setVerticalAlignment('middle');
+    const row = nextLeadRow_(sheet);
+    sheet.getRange(row, 1, 1, 3).setNumberFormat('@').setValues([[dateTime, safe_(name), phone]]);
+    sheet.getRange(row, 1, 1, 6).setVerticalAlignment('middle');
     sheet.setRowHeight(row, 32);
     return reply_('OK');
   } finally {
@@ -82,7 +81,7 @@ function doPost(e) {
     const sheet = sheet_();
     const row = matchingRow_(sheet, name, phone);
     if (row < 2) return rejectUpload_(id, 'No matching signup');
-    const cell = sheet.getRange(row, 3);
+    const cell = sheet.getRange(row, 6);
 
     // The same screenshot row cannot be used twice to claim a slot.
     if (cell.getDisplayValue() === 'View Screenshot') {
@@ -100,7 +99,7 @@ function doPost(e) {
     sheet.setRowHeight(row, 32);
     sheet.getImages().filter(img => {
       const anchor = img.getAnchorCell();
-      return anchor.getRow() === row && anchor.getColumn() === 3;
+      return anchor.getRow() === row && anchor.getColumn() === 6;
     }).forEach(img => img.remove());
     SpreadsheetApp.flush();
 
@@ -163,9 +162,9 @@ function matchingRow_(sheet, name, phone) {
   const last = sheet.getLastRow();
   if (last < 2) return -1;
   const first = Math.max(2, last - 999);
-  const entries = sheet.getRange(first, 1, last - first + 1, 4).getDisplayValues();
+  const entries = sheet.getRange(first, 1, last - first + 1, 3).getDisplayValues();
   for (let i = entries.length - 1; i >= 0; i--) {
-    if (entries[i][0] === name && entries[i][3] === phone) {
+    if (entries[i][1] === name && entries[i][2] === phone) {
       return first + i;
     }
   }
@@ -198,18 +197,18 @@ function restoreExistingScreenshotLinks() {
   const sheet = sheet_();
   const last = sheet.getLastRow();
   if (last < 2) return 'No rows to repair';
-  const notes = sheet.getRange(2, 3, last - 1, 1).getNotes();
+  const notes = sheet.getRange(2, 6, last - 1, 1).getNotes();
   let linked = 0;
   for (let i = 0; i < notes.length; i++) {
     const note = notes[i] || '';
     const match = note.match(/(?:Private backup:|Private screenshot:)\s*(https:\/\/drive\.google\.com\/file\/d\/[^\s]+)/);
     if (!match) continue;
     const row = i + 2;
-    setScreenshotLink_(sheet.getRange(row, 3), match[1]);
+    setScreenshotLink_(sheet.getRange(row, 6), match[1]);
     sheet.setRowHeight(row, 32);
     sheet.getImages().filter(img => {
       const a = img.getAnchorCell();
-      return a.getRow() === row && a.getColumn() === 3;
+      return a.getRow() === row && a.getColumn() === 6;
     }).forEach(img => img.remove());
     linked++;
   }
@@ -234,9 +233,26 @@ function safe_(value) {
 }
 
 function sheet_() {
-  const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName(SHEET_NAME);
-  if (!sheet) throw new Error('Sheet tab not found');
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  if (!ss) throw new Error('Bind this script to the new Google Sheet using Extensions > Apps Script');
+  let sheet = ss.getSheetByName(SHEET_NAME);
+  if (!sheet) sheet = ss.insertSheet(SHEET_NAME);
+  if (sheet.getLastRow() === 0) {
+    sheet.getRange(1, 1, 1, 6).setValues([['Date', 'Full Name', 'Phone Number', 'Status', 'Notes', 'Payment Screenshot']]);
+    sheet.setFrozenRows(1);
+  }
   return sheet;
+}
+
+// Never use getLastRow() alone: date-only rows may exist below actual leads.
+function nextLeadRow_(sheet) {
+  const last = sheet.getLastRow();
+  if (last < 2) return 2;
+  const values = sheet.getRange(2, 2, last - 1, 2).getDisplayValues();
+  for (let i = values.length - 1; i >= 0; i--) {
+    if (values[i][0] || values[i][1]) return i + 3;
+  }
+  return 2;
 }
 
 function reply_(message) {
