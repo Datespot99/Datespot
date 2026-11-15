@@ -1531,14 +1531,10 @@ function PaymentModal({ onClose, paymentType, device }: { onClose: () => void; p
       // When the updated Apps Script is deployed, its receipt status confirms
       // Drive save + sheet link before any frontend success is displayed.
       // The server alone deducts the slot; clients never decrement locally.
-      if (isLive) {
-        const remaining = await waitForScreenshotReceipt(uploadId);
-        setConfirmedSlots(remaining);
-      } else {
-        // Keep the existing upload flow working until the Apps Script owner
-        // redeploys the new server version. Live count stays unavailable.
-        void refresh();
-      }
+      // A no-cors POST does not prove the server saved the screenshot.
+      // Always require a server receipt before showing success.
+      const remaining = await waitForScreenshotReceipt(uploadId);
+      setConfirmedSlots(remaining);
     } catch (error) {
       setUploadState('idle');
       toast.error(error instanceof Error ? error.message : 'Screenshot upload failed. Please try again.');
