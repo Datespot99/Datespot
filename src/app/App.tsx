@@ -610,11 +610,20 @@ function TrustProof() {
             className="w-full rounded-2xl overflow-hidden flex items-center gap-3 sm:gap-5 p-3 sm:p-4"
             style={{ background: T.CARD_BG, border: '1px solid rgba(105,86,244,.18)', boxShadow: T.isDark ? 'none' : '0 4px 18px rgba(50,40,120,.06)' }}>
 
-            {/* Show the entire original proof screenshot without cropping. */}
-            <div className="w-[38%] sm:w-[40%] shrink-0 flex items-center justify-center rounded-xl overflow-hidden"
-              style={{ background: T.isDark ? 'rgba(255,255,255,.05)' : '#F7F7FC' }}>
-              <img src={c.img} alt={c.label} loading="lazy"
-                className="block w-full h-auto max-h-[170px] sm:max-h-[190px] object-contain" />
+            {/* Compact phone mockup framing the original, uncropped proof screenshot. */}
+            <div className="w-[38%] sm:w-[40%] shrink-0 flex justify-center items-center">
+              <div className="relative h-[174px] sm:h-[194px] aspect-[9/19] rounded-[20px] sm:rounded-[23px] p-[5px] sm:p-[6px]"
+                style={{ background: '#151925', border: '2px solid #424757', boxShadow: '0 7px 20px rgba(0,0,0,.20), inset 0 0 0 1px #717889' }}>
+                <div className="relative w-full h-full overflow-hidden rounded-[14px] sm:rounded-[16px] flex items-center justify-center"
+                  style={{ background: '#FFFFFF' }}>
+                  <img src={c.img} alt={c.label} loading="lazy"
+                    className="block w-full h-full object-contain" />
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[35%] h-[7px] rounded-b-full"
+                    style={{ background: '#151925' }} aria-hidden="true" />
+                </div>
+                <div className="absolute bottom-[3px] left-1/2 -translate-x-1/2 w-[25%] h-[2px] rounded-full"
+                  style={{ background: '#8E96A7' }} aria-hidden="true" />
+              </div>
             </div>
 
             <div className="min-w-0 flex-1 py-1">
