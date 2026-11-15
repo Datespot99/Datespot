@@ -1,7 +1,7 @@
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 
 // Same deployed Apps Script endpoint used by lead and screenshot submissions.
-export const SHEET_URL = 'https://script.google.com/macros/s/AKfycbwG6ThyTdVLgxsV3KRahrECQCu1NNavBlIVFtxn-upkEq4ed4Bo3xBX7cq8tjqvdy8lQQ/exec';
+export const SHEET_URL = ''; // Disconnected until the new sheet is verified.
 
 type SlotReply = { slots?: number; status?: 'saved' | 'error' | 'pending'; message?: string };
 type SlotContextValue = {
@@ -14,6 +14,7 @@ type SlotContextValue = {
 const SlotsContext = createContext<SlotContextValue | null>(null);
 
 function requestStatus(params: Record<string, string>): Promise<SlotReply> {
+  if (!SHEET_URL) return Promise.reject(new Error('Lead collection is temporarily unavailable'));
   return new Promise((resolve, reject) => {
     // Apps Script JSONP avoids CORS while exposing ONLY the public count and
     // an opaque receipt status; names, phones and images are never returned.
