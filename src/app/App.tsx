@@ -591,63 +591,50 @@ function TrustProof() {
   return (
     <section className="py-3">
       <div className="flex items-center justify-between mb-3">
-        <div>
+        <div className="border-l-[3px] pl-3" style={{ borderColor: B1 }}>
           <h2 className="font-extrabold text-lg" style={{ color: T.DARK, letterSpacing: '-0.03em' }}>Proof It Works</h2>
           <p className="text-[11px] font-semibold mt-0.5" style={{ color: T.MUTED }}>Real activity, real results</p>
         </div>
-        <span className="text-[10px] font-bold px-2 py-1 rounded-full text-white" style={{ background: HERO_GRAD }}>
+        <span className="text-xs font-extrabold px-3 py-1.5 rounded-full" style={{ color: B1, background: T.isDark ? 'rgba(90,70,255,.16)' : '#EEECFF' }}>
           {current + 1} / {proofCards.length}
         </span>
       </div>
 
-      <div className="relative overflow-hidden rounded-2xl select-none"
+      <div className="relative select-none"
         onTouchStart={e => { dragStart.current = e.touches[0].clientX; }}
         onTouchEnd={e => { const dx = dragStart.current - e.changedTouches[0].clientX; if (Math.abs(dx) > 40) dx > 0 ? goTo((current + 1) % proofCards.length, 1) : goTo((current - 1 + proofCards.length) % proofCards.length, -1); }}>
-
-        <AnimatePresence custom={direction} mode="popLayout">
+        <AnimatePresence custom={direction} mode="wait">
           <motion.div key={current} custom={direction} variants={variants}
             initial="enter" animate="center" exit="exit"
-            transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
-            className="w-full rounded-2xl overflow-hidden"
-            style={{ background: T.CARD_BG, border: `1px solid ${c.color}25`, boxShadow: T.isDark ? 'none' : '0 2px 12px rgba(0,0,0,0.07)' }}>
+            transition={{ duration: 0.28, ease: [0.4, 0, 0.2, 1] }}
+            className="w-full rounded-2xl overflow-hidden flex items-center gap-3 sm:gap-5 p-3 sm:p-4"
+            style={{ background: T.CARD_BG, border: '1px solid rgba(105,86,244,.18)', boxShadow: T.isDark ? 'none' : '0 4px 18px rgba(50,40,120,.06)' }}>
 
-            {/* Real screenshot — cropped to fixed height, blurred for privacy */}
-            <div className="relative overflow-hidden" style={{ height: 110 }}>
-              <img src={c.img} alt={c.label}
-                className="w-full h-full object-cover object-top" />
-              <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.2)' }} />
-              <div className="absolute top-2.5 right-2.5 flex items-center gap-1 px-2 py-0.5 rounded-full text-white"
-                style={{ background: c.color, fontSize: 9, fontWeight: 800 }}>
-                <span>{c.emoji}</span><span>{c.label}</span>
-              </div>
+            {/* Show the entire original proof screenshot without cropping. */}
+            <div className="w-[38%] sm:w-[40%] shrink-0 flex items-center justify-center rounded-xl overflow-hidden"
+              style={{ background: T.isDark ? 'rgba(255,255,255,.05)' : '#F7F7FC' }}>
+              <img src={c.img} alt={c.label} loading="lazy"
+                className="block w-full h-auto max-h-[170px] sm:max-h-[190px] object-contain" />
             </div>
 
-            {/* Quote */}
-            <div className="px-3.5 py-3">
-              <div className="flex gap-0.5 mb-1.5">
-                {[...Array(5)].map((_, j) => <Star key={j} className="w-2.5 h-2.5 fill-current" style={{ color: '#F59E0B' }} />)}
+            <div className="min-w-0 flex-1 py-1">
+              <div className="flex gap-0.5 mb-2" aria-label="5 out of 5 stars">
+                {[...Array(5)].map((_, j) => <Star key={j} className="w-3 h-3 fill-current" style={{ color: '#F59E0B' }} />)}
               </div>
-              <p className="text-[11.5px] leading-relaxed font-medium mb-2" style={{ color: T.QUOTE }}>"{r.text}"</p>
-              <div className="flex items-center gap-2">
-                <div className="w-5 h-5 rounded-full flex items-center justify-center text-white font-black text-[8px] shrink-0"
-                  style={{ background: HERO_GRAD }}>
-                  {r.name.split(' ').map((w: string) => w[0]).join('').slice(0, 2)}
-                </div>
-                <span className="text-[10px] font-bold" style={{ color: T.DARK }}>{r.name}</span>
-                <span className="text-[9px] font-semibold flex items-center gap-0.5 ml-auto" style={{ color: T.MUTED }}>
-                  <MapPin className="w-2 h-2" />{r.area}
-                </span>
-              </div>
+              <p className="text-[12px] sm:text-sm leading-relaxed font-semibold mb-3" style={{ color: T.QUOTE }}>"{r.text}"</p>
+              <p className="text-[11px] sm:text-xs font-bold" style={{ color: T.MUTED }}>— {r.name}</p>
+              <span className="text-[9px] font-semibold inline-block mt-1.5" style={{ color: B1 }}>{c.emoji} {c.label}</span>
             </div>
           </motion.div>
         </AnimatePresence>
       </div>
 
-      <div className="flex justify-center gap-1.5 mt-2.5">
+      <div className="flex justify-center items-center gap-2 mt-3" aria-label="Select testimonial">
         {proofCards.map((_, i) => (
           <button key={i} onClick={() => goTo(i, i > current ? 1 : -1)}
-            className="rounded-full transition-all duration-300"
-            style={{ width: i === current ? 16 : 4, height: 4, background: i === current ? B1 : (T.isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.15)') }} />
+            aria-label={`Show proof ${i + 1}`} aria-current={i === current ? 'true' : undefined}
+            className="rounded-full transition-all duration-300 p-1"
+          ><span className="block rounded-full" style={{ width: 7, height: 7, background: i === current ? B1 : (T.isDark ? 'rgba(255,255,255,0.3)' : '#B9B9CE') }} /></button>
         ))}
       </div>
     </section>
