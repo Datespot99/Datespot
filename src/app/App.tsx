@@ -685,7 +685,7 @@ function FAQ() {
         </div>
         <a href="https://t.me/subhash8055g" target="_blank" rel="noopener noreferrer"
           aria-label="Chat with Datespot support on Telegram before joining"
-          className="group inline-flex items-center justify-center gap-2.5 px-4 py-2.5 rounded-xl text-white text-[12px] font-extrabold w-full shadow-md transition-transform active:scale-[0.98]"
+          className="group inline-flex flex-nowrap items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-white text-[12px] font-extrabold w-full whitespace-nowrap shadow-md transition-transform active:scale-[0.98]"
           style={{ background: 'linear-gradient(110deg, #149DDD 0%, #1944F1 90%)', boxShadow: '0 4px 12px rgba(25,68,241,.18)' }}>
           <Send className="w-4 h-4 shrink-0" />
           <span>Chat on Telegram</span>
@@ -1467,7 +1467,7 @@ function PaymentModal({ onClose, paymentType, device }: { onClose: () => void; p
   const { isLive, refresh, setConfirmedSlots } = useSlots();
   const UPI_ID        = 'BHARATPE2R0S0C1D6V46619@unitype';
   const { amount: AMOUNT, original: ORIGINAL_AMT } = PRICING[device];
-  const TELEGRAM_LINK = 'https://t.me/+wRAGkbTVLLA0YzQ1';
+  const TELEGRAM_LINK = 'https://t.me/+CgjgUjhztc1lNDdl';
   const upiUrl        = `upi://pay?pa=${UPI_ID}&pn=Datespot&am=${AMOUNT}&cu=INR`;
 
   const [uploadState, setUploadState] = useState<UploadState>('idle');
