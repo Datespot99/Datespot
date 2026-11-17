@@ -753,11 +753,10 @@ function StickyCTA({ onJoin }: { onJoin: () => void }) {
               animate={{ x: ['-100%', '160%'] }}
               transition={{ duration: 2, repeat: Infinity, repeatDelay: 1.4, ease: 'easeInOut' }}
               style={{ background: 'rgba(255,255,255,0.14)', width: '60%' }} />
-            <div className="relative flex items-center justify-center gap-3 py-3.5 px-6">
-              <span className="font-black text-white text-sm tracking-tight">Join Datespot</span>
-              <span className="text-white/75 text-[11px] line-through font-semibold">{formatPrice(PRICING.mobile.original)}</span>
-              <span className="font-black text-white text-sm">Try Now for just {formatPrice(PRICING.mobile.amount)}</span>
-              <ArrowRight className="w-4 h-4 text-white" />
+            <div className="relative flex items-center justify-center gap-2 py-3.5 px-3 whitespace-nowrap">
+              <span className="font-extrabold text-white text-[clamp(11px,3.3vw,15px)] tracking-tight shrink-0">Try Now for just {formatPrice(PRICING.mobile.amount)}</span>
+              <span className="text-white/70 text-[clamp(10px,2.7vw,12px)] line-through font-semibold shrink-0">{formatPrice(PRICING.mobile.original)}</span>
+              <ArrowRight className="w-4 h-4 text-white shrink-0" />
             </div>
           </motion.button>
         </motion.div>
