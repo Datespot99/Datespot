@@ -643,7 +643,7 @@ function TrustProof() {
 // ─── FAQ ──────────────────────────────────────────────────────────────────────
 function FAQ() {
   const T = useT();
-  const [open, setOpen] = useState<number | null>(0);
+  const [open, setOpen] = useState<number | null>(null);
   const items = [
     { q: 'Is Datespot genuine?', a: 'Datespot is a Telegram-based dating community. Before joining, you can contact the admin directly on Telegram to ask questions about membership and access.' },
     { q: 'Can I speak to someone before paying?', a: 'Yes. Message @subhash8055g on Telegram before making any payment. Ask about the community, membership process, and what is included.' },
@@ -655,40 +655,40 @@ function FAQ() {
   ];
 
   return (
-    <section className="py-5" aria-labelledby="trust-faq-heading">
-      <div className="mb-3">
-        <h2 id="trust-faq-heading" className="text-lg font-extrabold" style={{ color: T.DARK }}>Questions Before You Join?</h2>
-        <p className="text-[11px] mt-1 font-medium" style={{ color: T.MUTED }}>Clear answers, and a real person to contact before paying.</p>
+    <section className="py-3" aria-labelledby="trust-faq-heading">
+      <div className="mb-2">
+        <h2 id="trust-faq-heading" className="text-base font-extrabold" style={{ color: T.DARK }}>Questions Before You Join?</h2>
+        <p className="text-[10px] mt-0.5 font-medium" style={{ color: T.MUTED }}>Clear answers, and a real person to contact before paying.</p>
       </div>
       <div className="rounded-2xl overflow-hidden" style={{ background: T.CARD_BG, border: '1px solid rgba(25,68,241,.18)' }}>
         {items.map((item, i) => (
           <div key={item.q} style={{ borderBottom: i === items.length - 1 ? 'none' : '1px solid rgba(125,130,170,.14)' }}>
-            <button type="button" className="w-full flex items-center justify-between gap-3 text-left px-4 py-3.5"
+            <button type="button" className="w-full flex items-center justify-between gap-2 text-left px-3.5 py-2.5"
               aria-expanded={open === i} aria-controls={`trust-faq-answer-${i}`}
               onClick={() => setOpen(open === i ? null : i)}>
-              <span className="text-[12px] sm:text-sm font-bold" style={{ color: T.DARK }}>{item.q}</span>
+              <span className="text-[11.5px] sm:text-sm font-bold" style={{ color: T.DARK }}>{item.q}</span>
               <ChevronDown className={`w-4 h-4 shrink-0 transition-transform ${open === i ? 'rotate-180' : ''}`} style={{ color: B1 }} />
             </button>
             {open === i && (
-              <div id={`trust-faq-answer-${i}`} className="px-4 pb-4 text-[11.5px] sm:text-xs leading-relaxed" style={{ color: T.MUTED }}>
+              <div id={`trust-faq-answer-${i}`} className="px-3.5 pb-3 text-[11px] sm:text-xs leading-relaxed" style={{ color: T.MUTED }}>
                 {item.a}
               </div>
             )}
           </div>
         ))}
       </div>
-      <div id="telegram-support" className="mt-3 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+      <div id="telegram-support" className="mt-2.5 rounded-2xl px-3.5 py-3 flex flex-col gap-2.5"
         style={{ background: T.isDark ? 'rgba(25,68,241,.10)' : '#F1F4FF', border: '1px solid rgba(25,68,241,.16)' }}>
         <div>
-          <p className="text-[13px] font-extrabold" style={{ color: T.DARK }}>Need help before joining?</p>
-          <p className="text-[11px] mt-1" style={{ color: T.MUTED }}>Message the admin on Telegram: @subhash8055g</p>
+          <p className="text-[12px] font-extrabold" style={{ color: T.DARK }}>Need help before joining?</p>
+          <p className="text-[10px] mt-0.5" style={{ color: T.MUTED }}>Message @subhash8055g on Telegram</p>
         </div>
         <a href="https://t.me/subhash8055g" target="_blank" rel="noopener noreferrer"
           aria-label="Chat with Datespot support on Telegram before joining"
-          className="group inline-flex items-center justify-between gap-3 px-4 py-3.5 rounded-2xl text-white text-sm font-extrabold shrink-0 w-full sm:w-auto shadow-lg transition-transform active:scale-[0.98] hover:-translate-y-0.5"
-          style={{ background: 'linear-gradient(110deg, #149DDD 0%, #1944F1 90%)', boxShadow: '0 6px 18px rgba(25,68,241,.20)' }}>
-          <span className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-white/20 shrink-0"><Send className="w-5 h-5" /></span>
-          <span className="flex-1 text-left leading-tight">Chat on Telegram<span className="block text-[10px] font-medium text-white/85 mt-0.5">Ask before you join</span></span>
+          className="group inline-flex items-center justify-center gap-2.5 px-4 py-2.5 rounded-xl text-white text-[12px] font-extrabold w-full shadow-md transition-transform active:scale-[0.98]"
+          style={{ background: 'linear-gradient(110deg, #149DDD 0%, #1944F1 90%)', boxShadow: '0 4px 12px rgba(25,68,241,.18)' }}>
+          <Send className="w-4 h-4 shrink-0" />
+          <span>Chat on Telegram</span>
           <ArrowRight className="w-4 h-4 shrink-0 transition-transform group-hover:translate-x-1" />
         </a>
       </div>
