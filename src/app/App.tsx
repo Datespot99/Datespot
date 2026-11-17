@@ -38,7 +38,7 @@ const HERO_GRAD = B1;
 // Separate desktop and mobile prices; UPI requests use the matching amount.
 const PRICING = {
   desktop: { amount: '1999', original: '2999' },
-  mobile:  { amount: '399', original: '999' },
+  mobile:  { amount: '10', original: '999' },
 } as const;
 type PricingDevice = keyof typeof PRICING;
 const formatPrice = (value: string) => `₹${Number(value).toLocaleString('en-IN')}`;
@@ -756,7 +756,7 @@ function StickyCTA({ onJoin }: { onJoin: () => void }) {
             <div className="relative flex items-center justify-center gap-3 py-3.5 px-6">
               <span className="font-black text-white text-sm tracking-tight">Join Datespot</span>
               <span className="text-white/75 text-[11px] line-through font-semibold">{formatPrice(PRICING.mobile.original)}</span>
-              <span className="font-black text-white text-sm">{formatPrice(PRICING.mobile.amount)}</span>
+              <span className="font-black text-white text-sm">Try Now for just {formatPrice(PRICING.mobile.amount)}</span>
               <ArrowRight className="w-4 h-4 text-white" />
             </div>
           </motion.button>
@@ -808,9 +808,12 @@ function MobileApp() {
 
 
               {/* Price */}
-              <div className="flex items-baseline gap-2 justify-center">
+              <div className="flex flex-col items-center gap-1">
+                <span className="text-xs font-bold" style={{ color: T.MUTED }}>Try Now for just</span>
+                <div className="flex items-baseline gap-2 justify-center">
                 <span className="text-sm line-through font-semibold" style={{ color: T.MUTED }}>{formatPrice(PRICING.mobile.original)}</span>
                 <span className="font-black text-4xl leading-none" style={{ color: B1 }}>{formatPrice(PRICING.mobile.amount)}</span>
+                </div>
               </div>
 
               {/* CTA Button */}
@@ -1358,7 +1361,7 @@ function ChatOverlay({ onClose, onOpenPayment }: { onClose: () => void; onOpenPa
                   <button onClick={() => { toast.success('Opening payment...'); onClose(); setTimeout(() => onOpenPayment(), 300); }}
                     className="px-5 py-2.5 rounded-2xl text-white font-bold text-xs active:scale-95 transition-transform shadow-md"
                     style={{ background: HERO_GRAD }}>
-                    Join for {formatPrice(PRICING.mobile.amount)}
+                    Try Now for just {formatPrice(PRICING.mobile.amount)}
                   </button>
                 ) : (
                   <div className="px-3.5 py-2.5 text-xs shadow-sm"
