@@ -911,23 +911,6 @@ export default function App() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  const [entered, setEntered] = useState(() => localStorage.getItem('ds_lead_submitted') === '1');
-  if (!entered) {
-    return (
-      <ThemeProvider>
-        <SlotsProvider>
-        <div className="min-h-screen w-full relative" style={{
-          backgroundColor: '#000000',
-          backgroundImage:
-            'radial-gradient(ellipse 60% 50% at 50% 45%, rgba(25,68,241,0.18), transparent 70%), radial-gradient(rgba(255,255,255,0.16) 1px, transparent 1.2px)',
-          backgroundSize: '100% 100%, 24px 24px',
-        }}>
-          <LeadModal gate onComplete={() => setEntered(true)} />
-        </div>
-        </SlotsProvider>
-      </ThemeProvider>
-    );
-  }
 
   return (
     <ThemeProvider>
