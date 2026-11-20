@@ -38,7 +38,7 @@ const HERO_GRAD = B1;
 // Separate desktop and mobile prices; UPI requests use the matching amount.
 const PRICING = {
   desktop: { amount: '1999', original: '2999' },
-  mobile:  { amount: '10', original: '999' },
+  mobile:  { amount: '100', original: '999' },
 } as const;
 type PricingDevice = keyof typeof PRICING;
 const formatPrice = (value: string) => `₹${Number(value).toLocaleString('en-IN')}`;
