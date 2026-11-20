@@ -115,7 +115,7 @@ const FEAT: { icon: React.ElementType; title: string; desc: string; badge?: stri
   { icon: Flame,         title: '18+ Exclusive',      desc: 'Photos, videos & more',       c1: '#EF4444', c2: '#F97316', badge: '18+' },
 ];
 
-const IMAGES   = [galleryImg1, galleryImg2, galleryImg3, galleryImg4, galleryImg5, galleryImg6];
+const IMAGES   = ['/group-preview-1.webp', '/group-preview-2.webp', '/group-preview-3.webp', '/group-preview-4.webp'];
 const VIDEOS   = ['https://player.vimeo.com/video/1182421154', 'https://player.vimeo.com/video/1182421156'];
 const QUESTIONS = ['Is this genuine?', 'How much is entry fee?', 'Refunds available?', 'Genuine Bangalore girls?', 'How to join?'];
 const AUDIO_FILES = [null, null, null, faq4Audio, faq5Audio];
