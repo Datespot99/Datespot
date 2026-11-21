@@ -1024,21 +1024,29 @@ function DesktopWrapper() {
 /* Desktop-only hero. The mobile screen is rendered by MobileApp and is not affected. */
 function DesktopHero() {
   const T = useT();
+  const [category, setCategory] = useState<PreviewCategory>('Group');
+  const images = PREVIEW_IMAGES[category];
   const [previewIndex, setPreviewIndex] = useState(0);
   const [previewPaused, setPreviewPaused] = useState(false);
 
   useEffect(() => {
     // Respect reduced-motion preferences while keeping manual navigation available.
-    if (previewPaused || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (previewPaused || images.length < 2 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     const timer = window.setInterval(
-      () => setPreviewIndex(index => (index + 1) % IMAGES.length),
+      () => setPreviewIndex(index => (index + 1) % images.length),
       3200,
     );
     return () => window.clearInterval(timer);
-  }, [previewPaused]);
+  }, [previewPaused, category, images.length]);
 
-  const changePreview = (offset: number) =>
-    setPreviewIndex(index => (index + offset + IMAGES.length) % IMAGES.length);
+  const changePreview = (offset: number) => {
+    if (!images.length) return;
+    setPreviewIndex(index => (index + offset + images.length) % images.length);
+  };
+  const selectCategory = (next: PreviewCategory) => {
+    setCategory(next);
+    setPreviewIndex(0);
+  };
 
   return (
     <section className="relative max-w-7xl mx-auto px-8 lg:px-12 xl:pl-[205px] pt-12 lg:pt-16 pb-5">
@@ -1112,14 +1120,14 @@ function DesktopHero() {
             </div>
             <div className="flex items-center gap-2 shrink-0">
               <span className="font-extrabold text-xs tabular-nums mr-1" style={{ color: B1 }}>
-                {previewIndex + 1} / {IMAGES.length}
+                {images.length ? previewIndex + 1 : 0} / {images.length}
               </span>
-              <button type="button" onClick={() => changePreview(-1)} aria-label="Previous group preview"
+              <button type="button" onClick={() => changePreview(-1)} disabled={!images.length} aria-label="Previous preview"
                 className="w-9 h-9 rounded-full flex items-center justify-center transition-transform hover:scale-105 active:scale-95"
                 style={{ color: B1, background: T.CARD_BG, border: '1px solid rgba(25,68,241,.26)' }}>
                 <ChevronDown className="w-4 h-4 rotate-90" />
               </button>
-              <button type="button" onClick={() => changePreview(1)} aria-label="Next group preview"
+              <button type="button" onClick={() => changePreview(1)} disabled={!images.length} aria-label="Next preview"
                 className="w-9 h-9 rounded-full flex items-center justify-center text-white transition-transform hover:scale-105 active:scale-95"
                 style={{ background: B1 }}>
                 <ChevronDown className="w-4 h-4 -rotate-90" />
@@ -1131,9 +1139,18 @@ function DesktopHero() {
             <div aria-hidden="true" className="pointer-events-none absolute rounded-full"
               style={{ width: '79%', height: '78%', left: '11%', top: '11%',
                 background: T.isDark ? 'rgba(25,68,241,.11)' : 'rgba(25,68,241,.055)' }} />
-            {IMAGES.map((src, i) => {
-              const half = Math.floor(IMAGES.length / 2);
-              const offset = ((i - previewIndex + IMAGES.length + half) % IMAGES.length) - half;
+            {images.length === 0 && (
+              <div className="absolute inset-0 flex items-center justify-center text-center px-8">
+                <div className="rounded-2xl border border-dashed px-7 py-9" style={{ background: T.CARD_BG, borderColor: `${B1}55` }}>
+                  <Sparkles className="w-8 h-8 mx-auto mb-3" style={{ color: B1 }} />
+                  <p className="font-extrabold" style={{ color: T.DARK }}>{category} gallery coming soon</p>
+                  <p className="text-xs mt-1" style={{ color: T.MUTED }}>Images will be added shortly.</p>
+                </div>
+              </div>
+            )}
+            {images.map((src, i) => {
+              const half = Math.floor(images.length / 2);
+              const offset = ((i - previewIndex + images.length + half) % images.length) - half;
               const distance = Math.abs(offset);
               const visible = distance <= 2;
               return (
@@ -1165,7 +1182,7 @@ function DesktopHero() {
           </div>
 
           <div className="flex items-center justify-center gap-2 mt-1">
-            {IMAGES.map((_, i) => (
+            {images.map((_, i) => (
               <button key={i} type="button" onClick={() => setPreviewIndex(i)}
                 aria-label={`Show group preview ${i + 1}`}
                 aria-current={i === previewIndex ? 'true' : undefined}
@@ -1173,6 +1190,21 @@ function DesktopHero() {
                 style={{ width: i === previewIndex ? 18 : 7, height: 7,
                   background: i === previewIndex ? B1 : (T.isDark ? '#47547D' : '#C5D2F9') }} />
             ))}
+          </div>
+          <div className="grid grid-cols-4 gap-2 lg:gap-3 mt-5" role="tablist" aria-label="Preview categories">
+            {PREVIEW_CATEGORIES.map(item => {
+              const Icon = { Group: Users, Girls: Heart, 'Direct Meets': MapPin, Reviews: Star }[item];
+              const active = category === item;
+              return (
+                <button key={item} type="button" role="tab" aria-selected={active}
+                  onClick={() => selectCategory(item)}
+                  className="flex items-center justify-center gap-2 rounded-2xl px-2 py-3 text-[11px] lg:text-sm font-extrabold whitespace-nowrap transition-colors"
+                  style={{ background: active ? B1 : T.CARD_BG, color: active ? 'white' : T.DARK,
+                    border: `1px solid ${active ? B1 : 'rgba(25,68,241,.2)'}` }}>
+                  <Icon className="w-4 h-4 shrink-0" /> {item}
+                </button>
+              );
+            })}
           </div>
         </div>
       </div>
