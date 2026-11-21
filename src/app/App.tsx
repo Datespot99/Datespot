@@ -412,45 +412,58 @@ function ReviewsStrip() {
   const T = useT();
   const [current, setCurrent] = useState(0);
   const touchX = useRef<number | null>(null);
+  const total = MEMBER_PHOTOS.length;
   useEffect(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const timer = window.setInterval(() => setCurrent(i => (i + 1) % MEMBER_PHOTOS.length), 4300);
+    const timer = window.setInterval(() => setCurrent(i => (i + 1) % total), 4300);
     return () => window.clearInterval(timer);
-  }, []);
-  const move = (offset: number) => setCurrent(i => (i + offset + MEMBER_PHOTOS.length) % MEMBER_PHOTOS.length);
+  }, [total]);
+  const move = (offset: number) => setCurrent(i => (i + offset + total) % total);
+  const review = REVIEWS[current];
   return (
-    <section className="py-5" aria-labelledby="member-photos-heading">
-      <div className="flex justify-between items-center gap-2 mb-3">
+    <section className="py-5" aria-labelledby="member-reviews-heading">
+      <div className="flex items-center justify-between mb-3">
         <div>
-          <h2 id="member-photos-heading" className="text-xl font-extrabold" style={{ color: T.DARK }}>Meet Our Members</h2>
-          <p className="text-[11px] font-medium mt-0.5" style={{ color: T.MUTED }}>A look at the Datespot community</p>
+          <h2 id="member-reviews-heading" className="text-xl font-extrabold" style={{ color: T.DARK }}>What Members Say</h2>
+          <p className="text-[11px] mt-0.5 font-medium" style={{ color: T.MUTED }}>Reviews from Bangalore</p>
         </div>
-        <span className="text-[11px] font-extrabold" style={{ color: B1 }}>{current + 1} / {MEMBER_PHOTOS.length}</span>
+        <span className="text-[11px] font-bold" style={{ color: B1 }}>{current + 1} / {total}</span>
       </div>
-      <div className="relative rounded-2xl overflow-hidden border border-[#1944F1]/20"
-        style={{ background: T.CARD_BG }}
+      <div className="relative rounded-2xl p-4 shadow-sm overflow-hidden"
+        style={{ background: T.CARD_BG, border: `1px solid ${B1}33` }}
         onTouchStart={e => { touchX.current = e.touches[0].clientX; }}
         onTouchEnd={e => { if (touchX.current === null) return; const dx = e.changedTouches[0].clientX - touchX.current; if (Math.abs(dx) > 45) move(dx < 0 ? 1 : -1); touchX.current = null; }}>
         <AnimatePresence mode="wait">
-          <motion.img key={MEMBER_PHOTOS[current]} src={MEMBER_PHOTOS[current]} alt={`Datespot member photo ${current + 1}`}
-            className="w-full h-[240px] sm:h-[300px] object-cover object-center"
-            loading="lazy" initial={{ opacity: 0, scale: 1.035 }} animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0 }} transition={{ duration: .32 }} />
+          <motion.div key={current} initial={{ opacity: 0, x: 22 }} animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -22 }} transition={{ duration: .26 }}>
+            <div className="flex gap-0.5 mb-3">
+              {Array.from({ length: 5 }, (_, j) => <Star key={j} className="w-3.5 h-3.5 fill-current" style={{ color: '#F59E0B' }} />)}
+            </div>
+            <p className="text-sm leading-relaxed font-medium mb-4 pr-1" style={{ color: T.QUOTE }}>&ldquo;{review.text}&rdquo;</p>
+            <div className="flex items-center gap-3">
+              <img src={MEMBER_PHOTOS[current]} alt="Reviewer profile" loading="lazy"
+                className="w-11 h-11 rounded-full object-cover object-center shrink-0"
+                style={{ border: `2px solid ${B1}40` }} />
+              <div>
+                <div className="text-sm font-extrabold" style={{ color: T.DARK }}>{review.name}</div>
+                <div className="text-[11px] flex items-center gap-1" style={{ color: T.MUTED }}>
+                  <MapPin className="w-3 h-3" />{review.area}
+                </div>
+              </div>
+            </div>
+          </motion.div>
         </AnimatePresence>
-        <button type="button" onClick={() => move(-1)} aria-label="Previous member photo"
-          className="absolute left-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/45 text-white flex items-center justify-center">
-          <ChevronDown className="w-5 h-5 rotate-90" />
-        </button>
-        <button type="button" onClick={() => move(1)} aria-label="Next member photo"
-          className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/45 text-white flex items-center justify-center">
-          <ChevronDown className="w-5 h-5 -rotate-90" />
-        </button>
-      </div>
-      <div className="flex justify-center gap-2 mt-3">
-        {MEMBER_PHOTOS.map((_, i) => (
-          <button key={i} type="button" onClick={() => setCurrent(i)} aria-label={`Show member photo ${i + 1}`}
-            className="h-2 rounded-full transition-all" style={{ width: current === i ? 22 : 8, background: current === i ? B1 : '#B8C7E6' }} />
-        ))}
+        <div className="flex items-center justify-between mt-4 pt-3" style={{ borderTop: '1px solid rgba(25,68,241,.12)' }}>
+          <button type="button" onClick={() => move(-1)} aria-label="Previous review"
+            className="text-xs font-bold px-2 py-1" style={{ color: B1 }}>‹ Previous</button>
+          <div className="flex items-center gap-1.5">
+            {MEMBER_PHOTOS.map((_, i) => <button type="button" key={i} onClick={() => setCurrent(i)}
+              aria-label={`Review ${i + 1}`} className="h-1.5 rounded-full transition-all"
+              style={{ width: i === current ? 19 : 6, background: i === current ? B1 : '#B9C8E8' }} />)}
+          </div>
+          <button type="button" onClick={() => move(1)} aria-label="Next review"
+            className="text-xs font-bold px-2 py-1" style={{ color: B1 }}>Next ›</button>
+        </div>
       </div>
     </section>
   );
@@ -1378,21 +1391,35 @@ function DesktopVersion({ onOpenPayment, showPayment, onClosePayment, paymentTyp
         <TrustProof />
       </section>
 
-      {/* Member-photo gallery replaces text review cards. */}
+      {/* Reviews grid — original review text with the new member-photo avatars. */}
       <section className="max-w-5xl mx-auto px-8 pb-12">
-        <div className="text-center mb-6">
-          <h2 className="font-extrabold text-3xl mb-1" style={{ color: T.DARK, letterSpacing: '-0.03em' }}>Meet Our Members</h2>
-          <p className="text-base font-medium" style={{ color: T.MUTED }}>A look at the Datespot community</p>
+        <div className="text-center mb-8">
+          <h2 className="font-extrabold text-3xl mb-1" style={{ color: T.DARK, letterSpacing: '-0.03em' }}>What Members Say</h2>
+          <p className="text-base font-medium" style={{ color: T.MUTED }}>Real reviews from Bangalore</p>
         </div>
         <div className="grid grid-cols-3 gap-4">
-          {MEMBER_PHOTOS.map((src, i) => (
-            <motion.div key={src} initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
-              transition={{ delay: i * .07 }}
-              className="rounded-2xl overflow-hidden relative"
-              style={{ background: T.CARD_BG, border: '1px solid rgba(25,68,241,.16)' }}>
-              <img src={src} alt={`Datespot member photo ${i + 1}`} loading="lazy"
-                className="w-full aspect-[4/3] object-cover object-center transition-transform duration-500 hover:scale-[1.04]" />
+          {REVIEWS.slice(0, MEMBER_PHOTOS.length).map((review, i) => (
+            <motion.div key={i}
+              initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }} transition={{ delay: i * 0.07 }}
+              className="rounded-2xl p-5 relative overflow-hidden"
+              style={{ background: T.CARD_BG, border: `1.5px solid ${B1}18`, boxShadow: T.isDark ? 'none' : '0 1px 8px rgba(0,0,0,0.06)' }}>
+              <div className="absolute top-0 left-0 w-1 h-full rounded-l-2xl" style={{ background: B1 }} />
+              <div className="flex gap-0.5 mb-2 ml-1">
+                {Array.from({ length: 5 }, (_, j) => <Star key={j} className="w-2.5 h-2.5 fill-current" style={{ color: '#F59E0B' }} />)}
+              </div>
+              <p className="text-sm leading-relaxed mb-3 font-medium ml-1" style={{ color: T.QUOTE }}>&ldquo;{review.text}&rdquo;</p>
+              <div className="flex items-center gap-2 ml-1">
+                <img src={MEMBER_PHOTOS[i]} alt="Reviewer profile" loading="lazy"
+                  className="w-9 h-9 rounded-full object-cover object-center shrink-0"
+                  style={{ border: `2px solid ${B1}40` }} />
+                <div>
+                  <div className="font-bold text-xs" style={{ color: T.DARK }}>{review.name}</div>
+                  <div className="text-[10px] font-semibold flex items-center gap-0.5" style={{ color: T.MUTED }}>
+                    <MapPin className="w-2.5 h-2.5" />{review.area}
+                  </div>
+                </div>
+              </div>
             </motion.div>
           ))}
         </div>
