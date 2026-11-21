@@ -37,8 +37,8 @@ const HERO_GRAD = B1;
 
 // Separate desktop and mobile prices; UPI requests use the matching amount.
 const PRICING = {
-  desktop: { amount: '1999', original: '2999' },
-  mobile:  { amount: '100', original: '999' },
+  desktop: { amount: '999', original: '2999' },
+  mobile:  { amount: '599', original: '999' },
 } as const;
 type PricingDevice = keyof typeof PRICING;
 const formatPrice = (value: string) => `₹${Number(value).toLocaleString('en-IN')}`;
@@ -309,8 +309,8 @@ function LeadModal({ onClose, onComplete, gate = false }: { onClose?: () => void
     <div className={`fixed inset-0 z-[999] flex items-center justify-center overflow-y-auto overflow-x-hidden px-4 py-3 sm:px-5 ${gate ? '' : 'bg-black/70'}`}
       style={{
         fontFamily: "'Plus Jakarta Sans', sans-serif",
-        backgroundColor: '#030714',
-        backgroundImage: "radial-gradient(ellipse 58% 53% at 50% 50%,rgba(25,68,241,.20),transparent 80%),radial-gradient(circle,rgba(114,130,175,.22) 1px,transparent 1px)",
+        backgroundColor: '#FFFFFF',
+        backgroundImage: "radial-gradient(ellipse 60% 50% at 50% 42%,rgba(25,68,241,.07),transparent 75%),radial-gradient(circle,rgba(25,68,241,.16) 1px,transparent 1px)",
         backgroundSize: 'auto, 22px 22px',
       }}>
       <motion.div className="absolute inset-0" initial={{ opacity: 0 }} animate={{ opacity: 1 }} onClick={gate ? undefined : onClose} />
@@ -323,31 +323,31 @@ function LeadModal({ onClose, onComplete, gate = false }: { onClose?: () => void
         transition={{ duration: 0.36, ease: [0.16, 1, 0.3, 1] }}
         role="dialog" aria-modal="true" aria-label="Enter your details"
         className="relative w-full max-w-[440px] rounded-[22px] sm:rounded-[24px] overflow-hidden shrink-0"
-        style={{ background: '#050A1A', border: '1px solid #1944F1', boxShadow: '0 28px 80px rgba(0,0,0,.75),0 0 48px rgba(25,68,241,.11)' }}>
+        style={{ background: '#FFFFFF', border: '1px solid #DFE5F2', boxShadow: '0 24px 65px rgba(25,50,105,.12)' }}>
         {!gate && <button onClick={onClose} aria-label="Close" className="absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center hover:bg-white/10">
           <X className="w-4 h-4" style={{ color: '#9CA9C5' }} />
         </button>}
         <div className="px-5 py-5 sm:px-9 sm:py-9">
           <div className="flex justify-center items-center gap-2 mb-4 sm:mb-7">
-            <span className="font-extrabold text-white text-xl tracking-tight">Datespot</span>
+            <span className="font-extrabold text-[#1944F1] text-xl tracking-tight">Datespot</span>
           </div>
           <div className="text-center mb-5 sm:mb-6">
-            <h2 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight mb-1.5">Enter Your Details</h2>
-            <p className="text-xs sm:text-sm" style={{ color: '#A6B2CF' }}>Join now and get instant access.</p>
+            <h2 className="text-xl sm:text-2xl font-extrabold text-[#15223B] tracking-tight mb-1.5">Welcome to Datespot</h2>
+            <p className="text-xs sm:text-sm" style={{ color: '#66748C' }}>Enter your details to explore Datespot.</p>
           </div>
           <form onSubmit={handleSubmit} className="flex flex-col gap-3.5 sm:gap-4">
             <div>
-              <label htmlFor="ds-signup-name" className="block text-[11px] font-bold uppercase tracking-wider mb-2" style={{ color: '#BCC7E3' }}>Full Name</label>
+              <label htmlFor="ds-signup-name" className="block text-[11px] font-bold uppercase tracking-wider mb-2" style={{ color: '#34425A' }}>Full Name</label>
               <input id="ds-signup-name" type="text" autoComplete="name" placeholder="Enter your full name"
                 value={name} onChange={e => setName(e.target.value)}
                 className="w-full rounded-xl px-4 py-3 sm:py-3.5 outline-none text-sm font-semibold transition-all"
-                style={{ background: '#030715', border: `1px solid ${name ? '#5474FF' : '#303A54'}`, color: '#F5F3F3', caretColor: '#1944F1' }} />
+                style={{ background: '#F8FAFF', border: `1px solid ${name ? '#1944F1' : '#D6DEED'}`, color: '#1A2940', caretColor: '#1944F1' }} />
             </div>
             <div>
               <label htmlFor="ds-signup-phone" className="block text-[11px] font-bold uppercase tracking-wider mb-2" style={{ color: '#BCC7E3' }}>Mobile Number</label>
               <div className="flex items-center rounded-xl overflow-hidden"
                 style={{ background: '#030715', border: `1px solid ${phone ? '#5474FF' : '#303A54'}` }}>
-                <span className="px-3.5 py-3 sm:py-3.5 text-sm font-bold shrink-0" style={{ color: '#B0C1EE', borderRight: '1px solid #303A54' }}>+91</span>
+                <span className="px-3.5 py-3 sm:py-3.5 text-sm font-bold shrink-0" style={{ color: '#40526F', borderRight: '1px solid #D6DEED' }}>+91</span>
                 <input id="ds-signup-phone" type="tel" inputMode="numeric" autoComplete="tel-national"
                   placeholder="Enter 10-digit number" value={phone} maxLength={10}
                   onChange={e => setPhone(e.target.value.replace(/\D/g, ''))}
@@ -357,7 +357,7 @@ function LeadModal({ onClose, onComplete, gate = false }: { onClose?: () => void
             </div>
             {error && (
               <motion.p initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }}
-                className="text-xs font-semibold text-red-300 bg-red-950/30 px-3 py-2 rounded-lg"
+                className="text-xs font-semibold text-red-700 bg-red-50 px-3 py-2 rounded-lg"
                 style={{ border: '1px solid rgba(239,68,68,.3)' }}>{error}</motion.p>
             )}
             <button type="submit" disabled={loading}
@@ -365,7 +365,7 @@ function LeadModal({ onClose, onComplete, gate = false }: { onClose?: () => void
               style={{ background: '#1944F1', color: '#FFFFFF', boxShadow: '0 6px 22px rgba(25,68,241,.25)' }}>
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <><span>{gate ? 'Continue' : 'Continue to Payment'}</span><ArrowRight className="w-4 h-4" /></>}
             </button>
-            <p className="text-center text-[11px] font-medium" style={{ color: '#8999BD' }}>🔒 Your info is private &amp; never shared</p>
+            <p className="text-center text-[11px] font-medium" style={{ color: '#62718A' }}>🔒 Your info is private &amp; never shared</p>
           </form>
         </div>
       </motion.div>
