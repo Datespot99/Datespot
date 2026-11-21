@@ -174,10 +174,34 @@ type PreviewCategory = 'Group' | 'Girls' | 'Direct Meets' | 'Reviews';
 const PREVIEW_CATEGORIES: PreviewCategory[] = ['Group', 'Girls', 'Direct Meets', 'Reviews'];
 // Add category-specific images here as the new gallery assets are supplied.
 const PREVIEW_IMAGES: Record<PreviewCategory, string[]> = {
-  Group: IMAGES,
-  Girls: [],
-  'Direct Meets': [],
-  Reviews: [],
+  "Group": [
+    "/Group/IMG_8452.PNG",
+    "/Group/IMG_8453.PNG",
+    "/Group/IMG_8454.PNG",
+    "/Group/IMG_8456.PNG",
+    "/Group/IMG_8457.PNG",
+  ],
+  "Girls": [
+    "/Girls/_.rohuuu_1769610827_3820094031338996244_65408999696.jpg",
+    "/Girls/_charuhasini__1756210434_3707684309681339645_5753026164.jpg",
+    "/Girls/swara_arya33_1680532593_3072852566772947603_4212973670.jpg",
+    "/Girls/tanvika_annareddy_1740309408_3574296838302072774_3571364442.jpg",
+    "/Girls/the__virgo__diaries_1750414703_3659066193492910596_67530504976.jpg",
+  ],
+  "Direct Meets": [
+    "/Direct%20Meets/700224373_18104842807960597_6945469374557922372_n.jpg",
+    "/Direct%20Meets/RDT_20260727_2358156629055607784070866.jpg",
+    "/Direct%20Meets/RDT_20260809_1425191724017602709332345.jpg",
+    "/Direct%20Meets/RDT_20260814_1604265502324680393758050.jpg",
+    "/Direct%20Meets/RDT_20260814_160625938772001270772049.jpg",
+  ],
+  "Reviews": [
+    "/Reviews/Datespot%20Feedback%20Chat%20in%20WhatsApp%20Dark%20Mode-1.png",
+    "/Reviews/Datespot%20Support%20Chat%20Feedback-3.png",
+    "/Reviews/Datespot%20WhatsApp%20Chat%20in%20Dark%20Mode-6.png",
+    "/Reviews/Datespot%20WhatsApp%20Feedback%20Chat-4.png",
+    "/Reviews/WhatsApp%20Feedback%20Chat%20in%20Bangalore-5.png",
+  ],
 };
 
 function GroupPreviewSlider({ mobile = false }: { mobile?: boolean }) {
