@@ -932,9 +932,6 @@ function MobileApp() {
         {/* Reviews slider */}
         <ReviewsStrip />
 
-        {/* Member proof appears before FAQs on mobile. */}
-        <TrustProof />
-
         {/* FAQ */}
         <FAQ />
 
