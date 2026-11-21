@@ -907,6 +907,77 @@ function MobileApp() {
   );
 }
 
+// Short, skippable introduction shown once immediately after registration.
+const INTRO_SCENES = [
+  { title: 'Tired of dating apps & online scams?', detail: 'Finding genuine dating connections can feel difficult, isn’t it?', emoji: '💔', color: '#FCE7F3' },
+  { title: 'Real dating should feel easier.', detail: 'Less confusion. More meaningful conversations.', emoji: '💬', color: '#EDE9FE' },
+  { title: 'That’s why we started Datespot!', detail: 'A community focused on genuine connections, less time-wasting and privacy.', emoji: '🛡️', color: '#DBEAFE' },
+  { title: 'Nam state bagge namge thane gothu :)', detail: 'Made with a local touch — for people who understand our vibe!', emoji: '💛', color: '#FEF3C7' },
+  { title: 'A to Z dating services', detail: 'Looking for a place to connect, chat and explore dating? You’re in the right place.', emoji: '💞', color: '#FCE7F3' },
+  { title: 'Banni, nam group join agi!', detail: 'Welcome to Datespot. Your next connection could start here.', emoji: '🚀', color: '#DBEAFE' },
+] as const;
+
+function DatespotIntro({ onFinish }: { onFinish: () => void }) {
+  const [step, setStep] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const finish = () => {
+    localStorage.setItem('ds_intro_seen', '1');
+    onFinish();
+  };
+  useEffect(() => {
+    if (paused || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const timer = window.setTimeout(() => {
+      if (step === INTRO_SCENES.length - 1) finish();
+      else setStep(i => i + 1);
+    }, step === INTRO_SCENES.length - 1 ? 3400 : 2800);
+    return () => window.clearTimeout(timer);
+  }, [step, paused]);
+  const scene = INTRO_SCENES[step];
+  return (
+    <div className="fixed inset-0 z-[1000] flex items-center justify-center overflow-hidden px-4 py-6"
+      style={{ background: 'radial-gradient(circle at 50% 35%,#E8EEFF,#FFFFFF 65%)', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+      <div className="absolute inset-0 pointer-events-none opacity-50" style={{ backgroundImage: 'radial-gradient(#B6C6FF 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
+      <div className="relative w-full max-w-[420px] min-h-[490px] sm:min-h-[550px] rounded-[30px] border border-[#D9E3FF] bg-white shadow-[0_22px_80px_rgba(25,68,241,.12)] flex flex-col overflow-hidden">
+        <div className="flex justify-between items-center px-6 pt-6">
+          <span className="text-[#1944F1] text-lg font-extrabold">Datespot 💙</span>
+          <button type="button" onClick={finish} className="text-xs font-bold text-[#52617E] px-3 py-2 rounded-lg hover:bg-[#F1F5FF]">Skip</button>
+        </div>
+        <div className="flex-1 flex flex-col items-center justify-center text-center px-7 py-5">
+          <AnimatePresence mode="wait">
+            <motion.div key={step} className="flex flex-col items-center w-full"
+              initial={{ opacity: 0, x: 45, scale: .94 }} animate={{ opacity: 1, x: 0, scale: 1 }}
+              exit={{ opacity: 0, x: -45, scale: .96 }} transition={{ duration: .45, ease: 'easeOut' }}>
+              <motion.div className="w-36 h-36 sm:w-40 sm:h-40 rounded-[40px] flex items-center justify-center mb-8 shadow-inner"
+                style={{ background: scene.color }}
+                animate={{ y: [0, -9, 0], rotate: [-3, 3, -3] }}
+                transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}>
+                <span className="text-[78px] leading-none" role="img" aria-label="Scene illustration">{scene.emoji}</span>
+              </motion.div>
+              <h2 className="text-[25px] sm:text-[29px] font-black leading-tight text-[#0E1B3C] mb-4">{scene.title}</h2>
+              <p className="text-[15px] leading-relaxed font-medium text-[#64718D]">{scene.detail}</p>
+            </motion.div>
+          </AnimatePresence>
+        </div>
+        <div className="px-6 pb-7">
+          <div className="flex justify-center gap-2 mb-5" aria-label={`Slide ${step + 1} of ${INTRO_SCENES.length}`}>
+            {INTRO_SCENES.map((_, i) => (
+              <button type="button" key={i} onClick={() => { setStep(i); setPaused(true); }}
+                aria-label={`Go to slide ${i + 1}`}
+                className="h-2 rounded-full transition-all duration-300"
+                style={{ width: i === step ? 28 : 8, background: i === step ? '#1944F1' : '#CBD5E8' }} />
+            ))}
+          </div>
+          <button type="button" onClick={() => step === INTRO_SCENES.length - 1 ? finish() : (setStep(i => i + 1), setPaused(true))}
+            className="w-full rounded-2xl py-4 text-white font-extrabold text-base flex justify-center items-center gap-2 active:scale-[.98] transition-transform"
+            style={{ background: '#1944F1', boxShadow: '0 8px 24px rgba(25,68,241,.22)' }}>
+            {step === INTRO_SCENES.length - 1 ? 'Try Now' : 'Next'} <ArrowRight className="w-5 h-5" />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
   const [isMobile, setIsMobile] = useState(true);
   useEffect(() => {
@@ -917,6 +988,7 @@ export default function App() {
   }, []);
 
   const [entered, setEntered] = useState(() => localStorage.getItem('ds_lead_submitted') === '1');
+  const [showIntro, setShowIntro] = useState(false);
   if (!entered) {
     return (
       <ThemeProvider>
@@ -926,7 +998,7 @@ export default function App() {
             backgroundImage: 'radial-gradient(ellipse 60% 50% at 50% 45%, rgba(25,68,241,0.18), transparent 70%), radial-gradient(rgba(255,255,255,0.16) 1px, transparent 1.2px)',
             backgroundSize: '100% 100%, 24px 24px',
           }}>
-            <LeadModal gate onComplete={() => setEntered(true)} />
+            <LeadModal gate onComplete={() => { setShowIntro(true); setEntered(true); }} />
           </div>
         </SlotsProvider>
       </ThemeProvider>
@@ -936,9 +1008,9 @@ export default function App() {
   return (
     <ThemeProvider>
       <SlotsProvider>
-        {isMobile
+        {showIntro ? <DatespotIntro onFinish={() => setShowIntro(false)} /> : (isMobile
           ? <MobileApp />
-          : <DesktopWrapper />}
+          : <DesktopWrapper />)}
       </SlotsProvider>
     </ThemeProvider>
   );
