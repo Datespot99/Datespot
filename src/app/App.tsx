@@ -320,19 +320,23 @@ function GroupPreviewSlider({ mobile = false }: { mobile?: boolean }) {
           </div>
         )}
 
+        {/* Compact segmented category switcher shared by mobile and desktop mockups. */}
         <div role="tablist" aria-label="Preview categories"
-          className="grid grid-cols-4 gap-1.5 sm:gap-3 mt-5">
+          className="grid grid-cols-4 gap-1 p-1 mt-3 rounded-2xl max-w-[420px] mx-auto"
+          style={{ background: T.isDark ? 'rgba(255,255,255,.06)' : 'rgba(25,68,241,.055)',
+            border: '1px solid rgba(25,68,241,.10)' }}>
           {PREVIEW_CATEGORIES.map(item => {
             const Icon = tabIcons[item];
             const active = category === item;
             return <button key={item} type="button" role="tab" aria-selected={active}
               onClick={() => selectCategory(item)}
-              className="flex items-center justify-center gap-1 rounded-xl py-2.5 px-1 sm:px-3 font-extrabold whitespace-nowrap transition-colors"
-              style={{ fontSize: mobile ? 'clamp(9px, 2.6vw, 12px)' : 14,
-                background: active ? B1 : T.CARD_BG, color: active ? '#fff' : T.DARK,
-                border: `1px solid ${active ? B1 : 'rgba(25,68,241,.2)'}` }}>
-              <Icon className="w-3 h-3 sm:w-4 sm:h-4 shrink-0" />
-              {item}
+              className="min-w-0 flex items-center justify-center gap-1 rounded-xl py-2 px-0.5 font-extrabold whitespace-nowrap transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+              style={{ fontSize: 'clamp(9px, 2.35vw, 11px)', letterSpacing: '-0.025em',
+                background: active ? 'linear-gradient(135deg, #1944F1, #355CFF)' : 'transparent',
+                color: active ? '#fff' : T.DARK,
+                boxShadow: active ? '0 3px 10px rgba(25,68,241,.22)' : 'none' }}>
+              <Icon className="w-3 h-3 shrink-0" strokeWidth={active ? 2.5 : 2} />
+              <span>{item}</span>
             </button>;
           })}
         </div>
