@@ -398,54 +398,63 @@ function StatsRow({ onJoin }: { onJoin: () => void }) {
   );
 }
 
-// ─── Reviews Slider ───────────────────────────────────────────────────────────
-const AVATAR_COLORS = ['#1944F1', '#4F46E5', '#0EA5E9', '#6366F1', '#0F2DBB', '#3B82F6', '#2563EB', '#7C3AED', '#1D4ED8', '#0284C7'];
+// Member photo gallery — photos supplied by the Datespot team.
+const MEMBER_PHOTOS = [
+  "/356808247_2019454628401768_4031109463594714357_n.jpg",
+  "/468028788_1932965163850195_1586026386361468904_n.jpg",
+  "/703844530_122099136147329700_7299003614957604277_n.jpg",
+  "/783510658_122123138145123723_4475087462369270598_n.jpg",
+  "/796996411_4330493380430715_8968024873129364303_n.jpg",
+  "/893114966_122269297298266719_4219188307620275945_n.jpg"
+] as const;
 
 function ReviewsStrip() {
-  const [current, setCurrent] = useState(0);
-  const [direction, setDirection] = useState(1);
-  const [dragging, setDragging] = useState(false);
-  const dragStartX = useRef(0);
-
-  const initials = (name: string) => name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
-
-  useEffect(() => {
-    const t = setInterval(() => { setDirection(1); setCurrent(p => (p + 1) % REVIEWS.length); }, 4000);
-    return () => clearInterval(t);
-  }, []);
-
-  const goTo = (i: number, dir: number) => { setDirection(dir); setCurrent(i); };
-  const prev = () => goTo((current - 1 + REVIEWS.length) % REVIEWS.length, -1);
-  const next = () => goTo((current + 1) % REVIEWS.length, 1);
-
-  const onTouchStart = (e: React.TouchEvent) => { dragStartX.current = e.touches[0].clientX; };
-  const onTouchEnd   = (e: React.TouchEvent) => {
-    const dx = dragStartX.current - e.changedTouches[0].clientX;
-    if (Math.abs(dx) > 40) dx > 0 ? next() : prev();
-  };
-  const onMouseDown  = (e: React.MouseEvent) => { setDragging(false); dragStartX.current = e.clientX; };
-  const onMouseUp    = (e: React.MouseEvent) => {
-    const dx = dragStartX.current - e.clientX;
-    if (Math.abs(dx) > 40) { setDragging(true); dx > 0 ? next() : prev(); }
-  };
-
-  const variants = {
-    enter: (d: number) => ({ x: d > 0 ? '60%' : '-60%', opacity: 0, scale: 0.94 }),
-    center: { x: 0, opacity: 1, scale: 1 },
-    exit: (d: number) => ({ x: d > 0 ? '-60%' : '60%', opacity: 0, scale: 0.94 }),
-  };
-
   const T = useT();
-  const r = REVIEWS[current];
-  const c1 = AVATAR_COLORS[current % AVATAR_COLORS.length];
-  const c2 = AVATAR_COLORS[(current + 3) % AVATAR_COLORS.length];
-
+  const [current, setCurrent] = useState(0);
+  const touchX = useRef<number | null>(null);
+  useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const timer = window.setInterval(() => setCurrent(i => (i + 1) % MEMBER_PHOTOS.length), 4300);
+    return () => window.clearInterval(timer);
+  }, []);
+  const move = (offset: number) => setCurrent(i => (i + offset + MEMBER_PHOTOS.length) % MEMBER_PHOTOS.length);
   return (
-    null
+    <section className="py-5" aria-labelledby="member-photos-heading">
+      <div className="flex justify-between items-center gap-2 mb-3">
+        <div>
+          <h2 id="member-photos-heading" className="text-xl font-extrabold" style={{ color: T.DARK }}>Meet Our Members</h2>
+          <p className="text-[11px] font-medium mt-0.5" style={{ color: T.MUTED }}>A look at the Datespot community</p>
+        </div>
+        <span className="text-[11px] font-extrabold" style={{ color: B1 }}>{current + 1} / {MEMBER_PHOTOS.length}</span>
+      </div>
+      <div className="relative rounded-2xl overflow-hidden border border-[#1944F1]/20"
+        style={{ background: T.CARD_BG }}
+        onTouchStart={e => { touchX.current = e.touches[0].clientX; }}
+        onTouchEnd={e => { if (touchX.current === null) return; const dx = e.changedTouches[0].clientX - touchX.current; if (Math.abs(dx) > 45) move(dx < 0 ? 1 : -1); touchX.current = null; }}>
+        <AnimatePresence mode="wait">
+          <motion.img key={MEMBER_PHOTOS[current]} src={MEMBER_PHOTOS[current]} alt={`Datespot member photo ${current + 1}`}
+            className="w-full h-[240px] sm:h-[300px] object-cover object-center"
+            loading="lazy" initial={{ opacity: 0, scale: 1.035 }} animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0 }} transition={{ duration: .32 }} />
+        </AnimatePresence>
+        <button type="button" onClick={() => move(-1)} aria-label="Previous member photo"
+          className="absolute left-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/45 text-white flex items-center justify-center">
+          <ChevronDown className="w-5 h-5 rotate-90" />
+        </button>
+        <button type="button" onClick={() => move(1)} aria-label="Next member photo"
+          className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/45 text-white flex items-center justify-center">
+          <ChevronDown className="w-5 h-5 -rotate-90" />
+        </button>
+      </div>
+      <div className="flex justify-center gap-2 mt-3">
+        {MEMBER_PHOTOS.map((_, i) => (
+          <button key={i} type="button" onClick={() => setCurrent(i)} aria-label={`Show member photo ${i + 1}`}
+            className="h-2 rounded-full transition-all" style={{ width: current === i ? 22 : 8, background: current === i ? B1 : '#B8C7E6' }} />
+        ))}
+      </div>
+    </section>
   );
 }
-
-function ReviewsSlideshow() { return null; }
 
 // ─── Animated Stats ───────────────────────────────────────────────────────────
 function useCountUp(target: number, duration = 1600) {
@@ -1300,9 +1309,6 @@ function DesktopVersion({ onOpenPayment, showPayment, onClosePayment, paymentTyp
   showPayment: boolean; onClosePayment: () => void; paymentType: 'full' | 'demo';
 }) {
   const T = useT();
-  const initials = (name: string) => name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
-  const avatarColors = AVATAR_COLORS;
-
   return (
     <div className="min-h-screen w-full relative" style={{ ...dotGridStyle(T), fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
       <ThemeToggle />
@@ -1372,37 +1378,21 @@ function DesktopVersion({ onOpenPayment, showPayment, onClosePayment, paymentTyp
         <TrustProof />
       </section>
 
-      {/* Reviews grid */}
+      {/* Member-photo gallery replaces text review cards. */}
       <section className="max-w-5xl mx-auto px-8 pb-12">
-        <div className="text-center mb-8">
-          <h2 className="font-extrabold text-3xl mb-1" style={{ color: T.DARK, letterSpacing: '-0.03em' }}>What Members Say</h2>
-          <p className="text-base font-medium" style={{ color: T.MUTED }}>Real reviews from Bangalore</p>
+        <div className="text-center mb-6">
+          <h2 className="font-extrabold text-3xl mb-1" style={{ color: T.DARK, letterSpacing: '-0.03em' }}>Meet Our Members</h2>
+          <p className="text-base font-medium" style={{ color: T.MUTED }}>A look at the Datespot community</p>
         </div>
         <div className="grid grid-cols-3 gap-4">
-          {REVIEWS.slice(0, 6).map((review, i) => (
-            <motion.div key={i}
-              initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }} transition={{ delay: i * 0.07 }}
-              className="rounded-2xl p-5 relative overflow-hidden"
-              style={{ background: T.CARD_BG, border: `1.5px solid ${B1}18`, boxShadow: T.isDark ? 'none' : '0 1px 8px rgba(0,0,0,0.06)' }}>
-              <div className="absolute top-0 left-0 w-1 h-full rounded-l-2xl"
-                style={{ background: `${avatarColors[i % avatarColors.length]}` }} />
-              <div className="flex gap-0.5 mb-2 ml-1">
-                {[...Array(5)].map((_, j) => <Star key={j} className="w-2.5 h-2.5 fill-current" style={{ color: '#F59E0B' }} />)}
-              </div>
-              <p className="text-sm leading-relaxed mb-3 font-medium ml-1" style={{ color: T.QUOTE }}>"{review.text}"</p>
-              <div className="flex items-center gap-2 ml-1">
-                <div className="w-7 h-7 rounded-full flex items-center justify-center text-white font-black text-[9px] shrink-0"
-                  style={{ background: `${avatarColors[i % avatarColors.length]}` }}>
-                  {initials(review.name)}
-                </div>
-                <div>
-                  <div className="font-bold text-xs" style={{ color: T.DARK }}>{review.name}</div>
-                  <div className="text-[10px] font-semibold flex items-center gap-0.5" style={{ color: T.MUTED }}>
-                    <MapPin className="w-2.5 h-2.5" />{review.area}
-                  </div>
-                </div>
-              </div>
+          {MEMBER_PHOTOS.map((src, i) => (
+            <motion.div key={src} initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
+              transition={{ delay: i * .07 }}
+              className="rounded-2xl overflow-hidden relative"
+              style={{ background: T.CARD_BG, border: '1px solid rgba(25,68,241,.16)' }}>
+              <img src={src} alt={`Datespot member photo ${i + 1}`} loading="lazy"
+                className="w-full aspect-[4/3] object-cover object-center transition-transform duration-500 hover:scale-[1.04]" />
             </motion.div>
           ))}
         </div>
