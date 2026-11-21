@@ -274,28 +274,48 @@ function GroupPreviewSlider({ mobile = false }: { mobile?: boolean }) {
                       setDirection(offset > 0 ? 1 : -1);
                       setCurrent(i);
                     }} aria-label={`Show ${category} preview ${i + 1}`}
-                    className="absolute overflow-hidden rounded-[18px] shadow-lg"
-                    style={{ height: mobile ? 250 : 280, width: mobile ? 150 : 176,
+                    className="absolute rounded-[27px] shadow-xl p-[3px]"
+                    style={{ height: mobile ? 250 : 280, width: mobile ? 128 : 144,
                       left: '50%', top: '50%', zIndex: 3 - distance,
-                      transform: `translate(-50%, -50%) translateX(${offset * (mobile ? 48 : 67)}px) rotate(${offset * 7}deg) scale(${1 - distance * .08})`,
+                      transform: `translate(-50%, -50%) translateX(${offset * (mobile ? 46 : 58)}px) rotate(${offset * 7}deg) scale(${1 - distance * .08})`,
                       transition: 'transform .4s ease, opacity .35s ease',
-                      opacity: distance > 1 ? .70 : .92,
-                      border: '1.5px solid rgba(100,116,139,.3)', background: '#fff' }}>
-                    <img src={src} alt="" className="block w-full h-full object-cover" />
+                      opacity: distance > 1 ? .72 : .9,
+                      background: 'linear-gradient(125deg, #e9edf2, #7f8897 40%, #ecf0f5 75%, #7e8896)',
+                      border: '1px solid #778292' }}>
+                    <div className="relative w-full h-full overflow-hidden rounded-[23px] bg-black p-[3px]">
+                      <div className="relative h-full w-full overflow-hidden rounded-[20px] bg-white">
+                        <img src={src} alt="" className="absolute inset-0 w-full h-full object-cover" />
+                        <div className="absolute top-[5px] left-1/2 -translate-x-1/2 w-[34%] h-[10px] bg-black rounded-full z-10" />
+                        <div className="absolute bottom-[5px] left-1/2 -translate-x-1/2 w-[30%] h-[3px] bg-white/80 rounded-full z-10" />
+                      </div>
+                    </div>
                   </button>
                 );
               })}
-              <div className="relative overflow-hidden rounded-[20px] shadow-2xl" style={{
-                height: mobile ? 295 : 326, width: mobile ? 180 : 202,
-                border: `2.5px solid ${B1}`, zIndex: 5, background: '#fff',
+              {/* iPhone 18 Pro-inspired titanium frame, Dynamic Island and edge-to-edge screen. */}
+              <div className="relative rounded-[32px] shadow-2xl p-[4px]" style={{
+                height: mobile ? 305 : 342, width: mobile ? 158 : 177,
+                zIndex: 5, background: 'linear-gradient(125deg, #f2f4f7 2%, #8a95a3 26%, #d9dfe7 55%, #7c8898 80%, #f2f4f7 100%)',
+                border: '1px solid #8794a2',
+                boxShadow: '0 20px 45px rgba(12,29,72,.24), inset 0 0 0 1px rgba(255,255,255,.6)',
               }}>
-                <AnimatePresence mode="wait" custom={direction}>
-                  <motion.img key={category + current} src={images[current]}
-                    alt={`${category} preview ${current + 1}`}
-                    custom={direction} variants={variants} initial="enter" animate="center" exit="exit"
-                    transition={{ duration: .32 }}
-                    className="absolute inset-0 w-full h-full object-cover" />
-                </AnimatePresence>
+                <div className="relative w-full h-full overflow-hidden rounded-[28px] bg-black p-[3px]">
+                  <div className="relative w-full h-full overflow-hidden rounded-[25px] bg-white">
+                    <AnimatePresence mode="wait" custom={direction}>
+                      <motion.img key={category + current} src={images[current]}
+                        alt={`${category} preview ${current + 1}`}
+                        custom={direction} variants={variants} initial="enter" animate="center" exit="exit"
+                        transition={{ duration: .32 }}
+                        className="absolute inset-0 w-full h-full object-cover" />
+                    </AnimatePresence>
+                    <div aria-hidden="true" className="absolute top-[6px] left-1/2 -translate-x-1/2 w-[34%] h-[13px] rounded-full bg-black z-10 flex justify-end items-center pr-[7px]">
+                      <span className="w-[4px] h-[4px] rounded-full bg-slate-700" />
+                    </div>
+                    <div aria-hidden="true" className="absolute bottom-[7px] left-1/2 -translate-x-1/2 w-[34%] h-[4px] rounded-full bg-white/85 shadow-sm z-10" />
+                  </div>
+                </div>
+                <div aria-hidden="true" className="absolute -right-[3px] top-[74px] w-[3px] h-[31px] rounded-r bg-slate-500" />
+                <div aria-hidden="true" className="absolute -left-[3px] top-[65px] w-[3px] h-[23px] rounded-l bg-slate-500" />
               </div>
             </div>
           ) : (
