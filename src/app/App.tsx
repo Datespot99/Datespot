@@ -650,20 +650,20 @@ function FAQ() {
   const T = useT();
   const [open, setOpen] = useState<number | null>(null);
   const items = [
-    { q: 'Is Datespot genuine?', a: 'Datespot is a Telegram-based dating community. Before joining, you can contact the admin directly on Telegram to ask questions about membership and access.' },
-    { q: 'Can I speak to someone before paying?', a: 'Yes. Message @subhash8055g on Telegram before making any payment. Ask about the community, membership process, and what is included.' },
-    { q: 'How does joining work?', a: 'Enter your name, Telegram ID and city, review the membership details and payment instructions, and submit your payment screenshot. Contact support if you need help with access.' },
-    { q: 'Are members verified?', a: 'Datespot uses admin-led membership review. Ask support about the current verification process; no online community can guarantee that every member is genuine.' },
-    { q: 'What if I pay but cannot access the group?', a: 'Contact @subhash8055g with your payment reference or screenshot so the admin can review your access issue. Do not share OTPs, passwords, or banking credentials.' },
-    { q: 'Are my registration details private?', a: 'Your registration details are collected to process your request. Before signing up, you can ask the admin how your information is stored, used, and retained.' },
-    { q: 'Is the membership fee refundable?', a: 'Please confirm the current refund terms with support before paying. Do not assume that a payment is refundable unless the terms explicitly say so.' },
+    { q: 'Is Datespot genuine?', a: "Datespot is a Telegram dating community. If you're new, chat with the admin first and check how the group works before deciding to join." },
+    { q: 'Can I speak to someone before paying?', a: "Of course! You can message @subhash8055g on Telegram. Ask anything about joining, fees or what happens after payment." },
+    { q: 'How does joining work?', a: "It's pretty simple: enter your name, Telegram ID and city, check the payment details, then select your payment screenshot. If you need help getting access, message the admin." },
+    { q: 'Are members verified?', a: "The group has an admin-led membership process, but it's smart to stay careful online. Nobody can promise every profile is genuine, so don't share private information with strangers." },
+    { q: 'What if I pay but cannot access the group?', a: "Don't worry about figuring it out alone. Send @subhash8055g your payment reference or screenshot and ask for help. Never send your OTP or banking password." },
+    { q: 'Are my registration details private?', a: "You can ask the admin exactly how signup details are used and stored before joining. And remember, keep personal information out of public chats." },
+    { q: 'Is the membership fee refundable?', a: "It's best to confirm the refund rules with the admin before paying. Don't assume a refund is available unless the terms say so." },
   ];
 
   return (
     <section className="py-3" aria-labelledby="trust-faq-heading">
       <div className="mb-2">
-        <h2 id="trust-faq-heading" className="text-base font-extrabold" style={{ color: T.DARK }}>Questions Before You Join?</h2>
-        <p className="text-[10px] mt-0.5 font-medium" style={{ color: T.MUTED }}>Clear answers, and a real person to contact before paying.</p>
+        <h2 id="trust-faq-heading" className="text-base font-extrabold" style={{ color: T.DARK }}>Frequently Asked Questions</h2>
+        <p className="text-[10px] mt-0.5 font-bold" style={{ color: T.MUTED }}>Answered by our Group members</p>
       </div>
       <div className="rounded-2xl overflow-hidden" style={{ background: T.CARD_BG, border: '1px solid rgba(25,68,241,.18)' }}>
         {items.map((item, i) => (
@@ -1258,17 +1258,17 @@ function DesktopFAQ() {
   const T = useT();
   const [open, setOpen] = useState<number | null>(0);
   const items = [
-    { q: 'Is Datespot genuine?', a: 'Datespot is a Bangalore-based Telegram community. The community has guidelines and an admin-led onboarding process.' },
-    { q: 'How do I get access?', a: `Enter your details, make the ${formatPrice(PRICING.desktop.amount)} UPI payment and upload your payment screenshot to continue to the Telegram invitation.` },
-    { q: 'What is included in membership?', a: 'Membership includes the group chat, voice calls, opportunities for direct meets and exclusive 18+ content.' },
-    { q: 'Can I use any UPI app?', a: 'You can scan the QR code or use the UPI ID shown on the payment screen with a compatible UPI app.' },
-    { q: 'Is it a one-time fee?', a: `Yes. The current joining price is ${formatPrice(PRICING.desktop.amount)} (original price ${formatPrice(PRICING.desktop.original)}) for lifetime access.` },
+    { q: 'Is Datespot genuine?', a: "It's a Bengaluru-based Telegram dating community with an admin-led joining process. Ask the admin how it works and make sure it's right for you." },
+    { q: 'How do I get access?', a: `First enter your details, then make the ${formatPrice(PRICING.desktop.amount)} UPI payment and select your payment screenshot. You'll then be directed toward the Telegram invite. Contact the admin if access doesn't work.` },
+    { q: 'What is included in membership?', a: "The group is built around chatting and meeting new people. Ask the admin which activities, calls or other services are currently included before paying." },
+    { q: 'Can I use any UPI app?', a: "Yes, a compatible UPI app should work. Just scan the QR code or use the UPI ID on the payment screen and double-check the details before paying." },
+    { q: 'Is it a one-time fee?', a: `The joining price shown is ${formatPrice(PRICING.desktop.amount)} instead of ${formatPrice(PRICING.desktop.original)}. For the current membership terms and any renewal conditions, check with the admin.` },
   ];
   return (
     <div>
       <div className="text-center mb-8">
         <h2 className="text-3xl font-extrabold mb-2" style={{ color: T.DARK, letterSpacing: '-0.03em' }}>Frequently Asked Questions</h2>
-        <p className="text-base font-medium" style={{ color: T.MUTED }}>Everything you need to know before joining</p>
+        <p className="text-base font-medium" style={{ color: T.MUTED }}>Answered by our Group members</p>
       </div>
       <div className="space-y-3">
         {items.map((item, i) => (
