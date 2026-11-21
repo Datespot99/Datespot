@@ -281,22 +281,25 @@ function GroupPreviewSlider({ images, mobile = false }: { images: string[]; mobi
 
 function LeadModal({ onClose, onComplete, gate = false }: { onClose?: () => void; onComplete: () => void; gate?: boolean }) {
   const [name, setName]       = useState('');
-  const [phone, setPhone]     = useState('');
+  const [telegram, setTelegram] = useState('');
+  const [city, setCity] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState('');
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     if (!name.trim()) { setError('Please enter your full name.'); return; }
-    if (!/^[6-9]\d{9}$/.test(phone.trim())) { setError('Enter a valid 10-digit Indian mobile number.'); return; }
+    if (!telegram.trim()) { setError('Please enter your Telegram ID or number.'); return; }
+    if (!city.trim()) { setError('Please enter your city name.'); return; }
     if (!LEADS_URL) { setError('Registration is temporarily unavailable. Please try again later.'); return; }
     setLoading(true);
     try {
-      const params = new URLSearchParams({ name: name.trim(), phone: phone.trim() });
+      const params = new URLSearchParams({ name: name.trim(), telegram: telegram.trim(), city: city.trim() });
       await fetch(`${LEADS_URL}?${params.toString()}`, { mode: 'no-cors' });
       localStorage.setItem('ds_lead_submitted', '1');
       localStorage.setItem('ds_lead_name', name.trim());
-      localStorage.setItem('ds_lead_phone', phone.trim());
+      localStorage.setItem('ds_lead_telegram', telegram.trim());
+      localStorage.setItem('ds_lead_city', city.trim());
       onComplete();
     } catch {
       setError('Something went wrong. Please try again.');
@@ -329,32 +332,34 @@ function LeadModal({ onClose, onComplete, gate = false }: { onClose?: () => void
         </button>}
         <div className="px-5 py-5 sm:px-9 sm:py-9">
           <div className="flex justify-center items-center gap-2 mb-4 sm:mb-7">
-            <span className="font-extrabold text-[#1944F1] text-xl tracking-tight">Datespot</span>
+            <span className="font-extrabold text-[#1944F1] text-2xl tracking-tight">Namaskara 🙏</span>
           </div>
           <div className="text-center mb-5 sm:mb-6">
             <h2 className="text-xl sm:text-2xl font-extrabold text-[#15223B] tracking-tight mb-1.5">Welcome to Datespot</h2>
-            <p className="text-xs sm:text-sm" style={{ color: '#66748C' }}>Enter your details to explore Datespot.</p>
+            <p className="text-xs sm:text-sm" style={{ color: '#66748C' }}>Enter your details to open Datespot.</p>
           </div>
           <form onSubmit={handleSubmit} className="flex flex-col gap-3.5 sm:gap-4">
             <div>
-              <label htmlFor="ds-signup-name" className="block text-[11px] font-bold uppercase tracking-wider mb-2" style={{ color: '#34425A' }}>Full Name</label>
+              <label htmlFor="ds-signup-name" className="block text-[11px] font-bold uppercase tracking-wider mb-2" style={{ color: '#34425A' }}>Full Name <span className="normal-case tracking-normal font-medium text-[#66748C]">(Anonymous names are welcome)</span></label>
               <input id="ds-signup-name" type="text" autoComplete="name" placeholder="Enter your full name"
                 value={name} onChange={e => setName(e.target.value)}
                 className="w-full rounded-xl px-4 py-3 sm:py-3.5 outline-none text-sm font-semibold transition-all"
                 style={{ background: '#F8FAFF', border: `1px solid ${name ? '#1944F1' : '#D6DEED'}`, color: '#1A2940', caretColor: '#1944F1' }} />
             </div>
-            <div>
-              <label htmlFor="ds-signup-phone" className="block text-[11px] font-bold uppercase tracking-wider mb-2" style={{ color: '#BCC7E3' }}>Mobile Number</label>
-              <div className="flex items-center rounded-xl overflow-hidden"
-                style={{ background: '#030715', border: `1px solid ${phone ? '#5474FF' : '#303A54'}` }}>
-                <span className="px-3.5 py-3 sm:py-3.5 text-sm font-bold shrink-0" style={{ color: '#40526F', borderRight: '1px solid #D6DEED' }}>+91</span>
-                <input id="ds-signup-phone" type="tel" inputMode="numeric" autoComplete="tel-national"
-                  placeholder="Enter 10-digit number" value={phone} maxLength={10}
-                  onChange={e => setPhone(e.target.value.replace(/\D/g, ''))}
-                  className="flex-1 min-w-0 px-3.5 py-3 sm:py-3.5 outline-none text-sm font-semibold bg-transparent"
-                  style={{ color: '#F5F3F3', caretColor: '#1944F1' }} />
-              </div>
-            </div>
+             <div>
+               <label htmlFor="ds-signup-telegram" className="block text-[11px] font-bold mb-2" style={{ color: '#34425A' }}>Telegram ID <span className="font-medium text-[#66748C]">(Safe &amp; more secure than WhatsApp)</span></label>
+               <input id="ds-signup-telegram" type="text" autoComplete="off" placeholder="Enter Telegram ID or number"
+                 value={telegram} onChange={e => setTelegram(e.target.value)}
+                 className="w-full rounded-xl px-4 py-3 sm:py-3.5 outline-none text-sm font-semibold transition-all"
+                 style={{ background: '#F8FAFF', border: `1px solid ${telegram ? '#1944F1' : '#D6DEED'}`, color: '#1A2940', caretColor: '#1944F1' }} />
+             </div>
+             <div>
+               <label htmlFor="ds-signup-city" className="block text-[11px] font-bold mb-2" style={{ color: '#34425A' }}>City Name <span className="font-medium text-[#66748C]">(Important Bigulu!!)</span></label>
+               <input id="ds-signup-city" type="text" autoComplete="address-level2" placeholder="Enter your city name"
+                 value={city} onChange={e => setCity(e.target.value)}
+                 className="w-full rounded-xl px-4 py-3 sm:py-3.5 outline-none text-sm font-semibold transition-all"
+                 style={{ background: '#F8FAFF', border: `1px solid ${city ? '#1944F1' : '#D6DEED'}`, color: '#1A2940', caretColor: '#1944F1' }} />
+             </div>
             {error && (
               <motion.p initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }}
                 className="text-xs font-semibold text-red-700 bg-red-50 px-3 py-2 rounded-lg"
@@ -365,7 +370,7 @@ function LeadModal({ onClose, onComplete, gate = false }: { onClose?: () => void
               style={{ background: '#1944F1', color: '#FFFFFF', boxShadow: '0 6px 22px rgba(25,68,241,.25)' }}>
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <><span>{gate ? 'Continue' : 'Continue to Payment'}</span><ArrowRight className="w-4 h-4" /></>}
             </button>
-            <p className="text-center text-[11px] font-medium" style={{ color: '#62718A' }}>🔒 Your info is private &amp; never shared</p>
+            <p className="text-center text-[11px] font-medium" style={{ color: '#62718A' }}>🛡️ Your privacy is our priority!</p>
           </form>
         </div>
       </motion.div>
@@ -647,10 +652,10 @@ function FAQ() {
   const items = [
     { q: 'Is Datespot genuine?', a: 'Datespot is a Telegram-based dating community. Before joining, you can contact the admin directly on Telegram to ask questions about membership and access.' },
     { q: 'Can I speak to someone before paying?', a: 'Yes. Message @subhash8055g on Telegram before making any payment. Ask about the community, membership process, and what is included.' },
-    { q: 'How does joining work?', a: 'Enter your name and phone number, review the membership details and payment instructions, and submit your payment screenshot. Contact support if you need help with access.' },
+    { q: 'How does joining work?', a: 'Enter your name, Telegram ID and city, review the membership details and payment instructions, and submit your payment screenshot. Contact support if you need help with access.' },
     { q: 'Are members verified?', a: 'Datespot uses admin-led membership review. Ask support about the current verification process; no online community can guarantee that every member is genuine.' },
     { q: 'What if I pay but cannot access the group?', a: 'Contact @subhash8055g with your payment reference or screenshot so the admin can review your access issue. Do not share OTPs, passwords, or banking credentials.' },
-    { q: 'Is my phone number private?', a: 'Your registration details are collected to process your request. Before signing up, you can ask the admin how your information is stored, used, and retained.' },
+    { q: 'Are my registration details private?', a: 'Your registration details are collected to process your request. Before signing up, you can ask the admin how your information is stored, used, and retained.' },
     { q: 'Is the membership fee refundable?', a: 'Please confirm the current refund terms with support before paying. Do not assume that a payment is refundable unless the terms explicitly say so.' },
   ];
 
