@@ -207,34 +207,28 @@ const PREVIEW_IMAGES: Record<PreviewCategory, string[]> = {
 function GroupPreviewSlider({ mobile = false }: { mobile?: boolean }) {
   const [category, setCategory] = useState<PreviewCategory>('Group');
   const [current, setCurrent] = useState(0);
-  const [direction, setDirection] = useState(1);
+  const [isPaused, setIsPaused] = useState(false);
   const T = useT();
   const images = PREVIEW_IMAGES[category];
   const selectCategory = (next: PreviewCategory) => {
     setCategory(next);
     setCurrent(0);
-    setDirection(1);
   };
   const nav = (step: number) => {
     if (!images.length) return;
-    setDirection(step);
     setCurrent(i => (i + step + images.length) % images.length);
   };
 
   useEffect(() => {
-    if (images.length <= 1 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (isPaused || images.length <= 1 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     const id = window.setInterval(() => {
-      setDirection(1);
-      setCurrent(i => (i + 1) % images.length);
-    }, 3500);
+      if (!document.hidden) setCurrent(i => (i + 1) % images.length);
+    }, 4800);
     return () => window.clearInterval(id);
-  }, [category, images.length]);
+  }, [category, images.length, isPaused]);
 
-  const variants = {
-    enter: (dir: number) => ({ x: dir > 0 ? '65%' : '-65%', opacity: 0 }),
-    center: { x: 0, opacity: 1 },
-    exit: (dir: number) => ({ x: dir > 0 ? '-65%' : '65%', opacity: 0 }),
-  };
+  // Crossfade the screenshots inside fixed phone frames; avoid sliding full images out of the phone.
+  const imageTransition = { duration: 0.48, ease: 'easeInOut' as const };
   const tabIcons = { Group: Users, Girls: Heart, 'Direct Meets': MapPin, Reviews: Star };
   return (
     <section className={mobile ? 'py-6' : 'py-3'}>
@@ -259,33 +253,36 @@ function GroupPreviewSlider({ mobile = false }: { mobile?: boolean }) {
           </div>
         </div>
 
-        <div className="relative flex items-center justify-center" style={{ minHeight: mobile ? 325 : 375 }}>
+        <div className="relative flex items-center justify-center" style={{ minHeight: mobile ? 325 : 375 }}
+          onMouseEnter={() => setIsPaused(true)} onMouseLeave={() => setIsPaused(false)}
+          onFocusCapture={() => setIsPaused(true)} onBlurCapture={() => setIsPaused(false)}
+          onTouchStart={() => setIsPaused(true)} onTouchEnd={() => setIsPaused(false)}>
           {images.length ? (
             <div className="relative w-full flex items-center justify-center" style={{ height: mobile ? 325 : 375 }}>
               <div className="absolute w-[80%] max-w-[460px] h-[78%] rounded-full blur-3xl opacity-10" style={{ background: B1 }} />
-              {images.map((src, i) => {
-                // One card per image, distributed behind the selected centre image.
-                const forward = (i - current + images.length) % images.length;
-                const offset = forward > Math.floor(images.length / 2) ? forward - images.length : forward;
-                if (offset === 0) return null;
+              {[-2, -1, 1, 2].map(offset => {
+                if (images.length <= Math.abs(offset)) return null;
                 const distance = Math.abs(offset);
+                const index = (current + offset + images.length) % images.length;
                 return (
-                  <button type="button" key={category + i} onClick={() => {
-                      setDirection(offset > 0 ? 1 : -1);
-                      setCurrent(i);
-                    }} aria-label={`Show ${category} preview ${i + 1}`}
+                  <button type="button" key={category + offset} onClick={() => nav(offset)}
+                    aria-label={`Show ${category} preview ${index + 1}`}
                     className="absolute rounded-[27px] shadow-xl p-[3px]"
                     style={{ height: mobile ? 250 : 280, width: mobile ? 128 : 144,
                       left: '50%', top: '50%', zIndex: 3 - distance,
                       transform: `translate(-50%, -50%) translateX(${offset * (mobile ? 46 : 58)}px) rotate(${offset * 7}deg) scale(${1 - distance * .08})`,
-                      transition: 'transform .4s ease, opacity .35s ease',
                       opacity: distance > 1 ? .22 : .36,
                       filter: distance > 1 ? 'blur(7px)' : 'blur(5px)',
                       background: 'linear-gradient(125deg, #e9edf2, #7f8897 40%, #ecf0f5 75%, #7e8896)',
                       border: '1px solid #778292' }}>
                     <div className="relative w-full h-full overflow-hidden rounded-[23px] bg-black p-[3px]">
                       <div className="relative h-full w-full overflow-hidden rounded-[20px] bg-white">
-                        <img src={src} alt="" className="absolute inset-0 w-full h-full object-cover" />
+                        <AnimatePresence initial={false}>
+                          <motion.img key={category + index} src={images[index]} alt=""
+                            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                            transition={imageTransition}
+                            className="absolute inset-0 w-full h-full object-cover" />
+                        </AnimatePresence>
                         <div className="absolute top-[5px] left-1/2 -translate-x-1/2 w-[34%] h-[10px] bg-black rounded-full z-10" />
                         <div className="absolute bottom-[5px] left-1/2 -translate-x-1/2 w-[30%] h-[3px] bg-white/80 rounded-full z-10" />
                       </div>
@@ -302,11 +299,12 @@ function GroupPreviewSlider({ mobile = false }: { mobile?: boolean }) {
               }}>
                 <div className="relative w-full h-full overflow-hidden rounded-[28px] bg-black p-[3px]">
                   <div className="relative w-full h-full overflow-hidden rounded-[25px] bg-white">
-                    <AnimatePresence mode="wait" custom={direction}>
+                    <AnimatePresence initial={false}>
                       <motion.img key={category + current} src={images[current]}
                         alt={`${category} preview ${current + 1}`}
-                        custom={direction} variants={variants} initial="enter" animate="center" exit="exit"
-                        transition={{ duration: .32 }}
+                        initial={{ opacity: 0, scale: 1.035 }} animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: .99 }}
+                        transition={imageTransition}
                         className="absolute inset-0 w-full h-full object-cover" />
                     </AnimatePresence>
                     <div aria-hidden="true" className="absolute top-[6px] left-1/2 -translate-x-1/2 w-[34%] h-[13px] rounded-full bg-black z-10 flex justify-end items-center pr-[7px]">
@@ -332,7 +330,7 @@ function GroupPreviewSlider({ mobile = false }: { mobile?: boolean }) {
         {images.length > 0 && (
           <div className="flex items-center justify-center gap-1.5 mt-1" aria-label="Image position">
             {images.map((_, i) => (
-              <button key={i} type="button" onClick={() => { setDirection(i > current ? 1 : -1); setCurrent(i); }}
+              <button key={i} type="button" onClick={() => setCurrent(i)}
                 aria-label={`Show ${category} image ${i + 1}`} aria-current={i === current ? 'true' : undefined}
                 className="rounded-full transition-all duration-300"
                 style={{ width: i === current ? 18 : 6, height: 6,
