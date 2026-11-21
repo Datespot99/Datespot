@@ -1311,6 +1311,23 @@ function DesktopVersion({ onOpenPayment, showPayment, onClosePayment, paymentTyp
         <DesktopFAQ />
       </section>
 
+      {/* Desktop Telegram support — same admin contact as mobile */}
+      <section className="max-w-3xl mx-auto px-8 pb-12">
+        <div className="rounded-2xl px-6 py-6 flex items-center justify-between gap-6"
+          style={{ background: T.isDark ? 'rgba(25,68,241,.10)' : '#F1F4FF', border: '1px solid rgba(25,68,241,.16)' }}>
+          <div>
+            <h2 className="text-xl font-extrabold" style={{ color: T.DARK }}>Need help before joining?</h2>
+            <p className="text-sm mt-1" style={{ color: T.MUTED }}>Contact @subhash8055g directly on Telegram</p>
+          </div>
+          <a href="https://t.me/subhash8055g" target="_blank" rel="noopener noreferrer"
+            aria-label="Contact Datespot support on Telegram"
+            className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl px-5 py-3 text-white text-sm font-extrabold transition-transform hover:scale-[1.03] active:scale-[.98]"
+            style={{ background: 'linear-gradient(110deg, #149DDD 0%, #1944F1 90%)', boxShadow: '0 4px 12px rgba(25,68,241,.18)' }}>
+            <Send className="w-4 h-4" /> Contact on Telegram
+          </a>
+        </div>
+      </section>
+
       {/* Footer */}
       <footer className="max-w-7xl mx-auto px-8 py-8 text-center" style={{ borderTop: `1px solid rgba(25,68,241,0.2)` }}>
         <p className="text-sm font-semibold" style={{ color: T.MUTED }}>
