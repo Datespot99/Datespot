@@ -170,105 +170,123 @@ function GlassBlob({ size, top, left, right, bottom, rotate = 0, rx = '62% 38% 7
 }
 
 // ─── Group Preview Slider ─────────────────────────────────────────────────────
-function GroupPreviewSlider({ images, mobile = false }: { images: string[]; mobile?: boolean }) {
+type PreviewCategory = 'Group' | 'Girls' | 'Direct Meets' | 'Reviews';
+const PREVIEW_CATEGORIES: PreviewCategory[] = ['Group', 'Girls', 'Direct Meets', 'Reviews'];
+// Add category-specific images here as the new gallery assets are supplied.
+const PREVIEW_IMAGES: Record<PreviewCategory, string[]> = {
+  Group: IMAGES,
+  Girls: [],
+  'Direct Meets': [],
+  Reviews: [],
+};
+
+function GroupPreviewSlider({ mobile = false }: { mobile?: boolean }) {
+  const [category, setCategory] = useState<PreviewCategory>('Group');
   const [current, setCurrent] = useState(0);
   const [direction, setDirection] = useState(1);
   const T = useT();
-
-  useEffect(() => {
-    const id = setInterval(() => {
-      setDirection(1);
-      setCurrent(prev => (prev + 1) % images.length);
-    }, 2800);
-    return () => clearInterval(id);
-  }, [images.length]);
-
-  const variants = {
-    enter: (dir: number) => ({ x: dir > 0 ? '100%' : '-100%', opacity: 0 }),
-    center: { x: 0, opacity: 1 },
-    exit: (dir: number) => ({ x: dir > 0 ? '-100%' : '100%', opacity: 0 }),
+  const images = PREVIEW_IMAGES[category];
+  const selectCategory = (next: PreviewCategory) => {
+    setCategory(next);
+    setCurrent(0);
+    setDirection(1);
+  };
+  const nav = (step: number) => {
+    if (!images.length) return;
+    setDirection(step);
+    setCurrent(i => (i + step + images.length) % images.length);
   };
 
-  const nav = (i: number) => { setDirection(i > current ? 1 : -1); setCurrent(i); };
+  useEffect(() => {
+    if (images.length <= 1 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const id = window.setInterval(() => {
+      setDirection(1);
+      setCurrent(i => (i + 1) % images.length);
+    }, 3500);
+    return () => window.clearInterval(id);
+  }, [category, images.length]);
 
-  if (mobile) {
-    return (
-      <section className="py-6">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h2 className="font-extrabold text-xl" style={{ color: T.DARK, letterSpacing: '-0.03em' }}>Group Preview</h2>
-            <p className="text-xs font-semibold mt-0.5" style={{ color: T.MUTED }}>Swipe for screenshots </p>
-          </div>
-          <span className="text-[10px] font-bold px-3 py-1.5 rounded-full text-white" style={{ background: HERO_GRAD }}>
-            {current + 1} / {images.length}
-          </span>
-        </div>
-        <div className="flex justify-center">
-          <div className="relative" style={{ width: '72vw', maxWidth: 240 }}>
-            {/* Glow halo */}
-            <div className="absolute inset-0 rounded-3xl blur-2xl opacity-30 scale-95" style={{ background: HERO_GRAD }} />
-            <div
-              className="relative overflow-hidden rounded-3xl shadow-2xl"
-              style={{ aspectRatio: '9/16', border: '2.5px solid rgba(25,68,241,0.2)' }}
-            >
-              <AnimatePresence custom={direction} mode="popLayout">
-                <motion.img
-                  key={current} src={images[current]} alt={`Preview ${current + 1}`}
-                  custom={direction} variants={variants} initial="enter" animate="center" exit="exit"
-                  transition={{ duration: 0.42, ease: [0.4, 0, 0.2, 1] }}
-                  className="absolute inset-0 w-full h-full object-cover"
-                />
-              </AnimatePresence>
-              {/* Bottom gradient overlay */}
-              {/* Dot indicators */}
-              <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-1 z-10">
-                {images.map((_, i) => (
-                  <button key={i} onClick={() => nav(i)} className="rounded-full transition-all duration-300"
-                    style={{ width: i === current ? 18 : 5, height: 5, background: i === current ? 'white' : 'rgba(255,255,255,0.45)' }} />
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-    );
-  }
-
+  const variants = {
+    enter: (dir: number) => ({ x: dir > 0 ? '65%' : '-65%', opacity: 0 }),
+    center: { x: 0, opacity: 1 },
+    exit: (dir: number) => ({ x: dir > 0 ? '-65%' : '65%', opacity: 0 }),
+  };
+  const tabIcons = { Group: Users, Girls: Heart, 'Direct Meets': MapPin, Reviews: Star };
   return (
-    <section className="py-20 px-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full mb-4 text-xs font-bold uppercase tracking-widest" style={{ background: `${B1}12`, color: B1 }}>
-            <Sparkles className="w-3 h-3" /> Real Content
+    <section className={mobile ? 'py-6' : 'py-12 px-8'}>
+      <div className={mobile ? 'w-full' : 'max-w-5xl mx-auto'}>
+        <div className="flex items-center justify-between gap-3 mb-5">
+          <div className="min-w-0">
+            <h2 className={mobile ? 'font-extrabold text-xl' : 'font-extrabold text-3xl'} style={{ color: T.DARK, letterSpacing: '-0.03em' }}>
+              <Users className="w-5 h-5 inline-block align-middle mr-1.5" style={{ color: B1 }} /> Group Preview
+            </h2>
+            <p className="text-xs font-medium mt-1 ml-7" style={{ color: T.MUTED }}>See what's inside the group</p>
           </div>
-          <h2 className="text-5xl mb-3 font-bold" style={{ color: T.DARK, letterSpacing: '-0.03em' }}>Group Preview</h2>
-          <p className="text-lg font-medium" style={{ color: T.MUTED }}>See exactly what you're joining</p>
+          <div className="flex items-center gap-2 shrink-0">
+            <span className="text-xs font-black mr-1" style={{ color: B1 }}>{images.length ? current + 1 : 0} / {images.length}</span>
+            <button type="button" aria-label="Previous preview" disabled={!images.length} onClick={() => nav(-1)}
+              className="w-8 h-8 rounded-full border flex items-center justify-center disabled:opacity-35" style={{ borderColor: B1, color: B1 }}>
+              <ArrowRight className="w-4 h-4 rotate-180" />
+            </button>
+            <button type="button" aria-label="Next preview" disabled={!images.length} onClick={() => nav(1)}
+              className="w-8 h-8 rounded-full text-white flex items-center justify-center disabled:opacity-35" style={{ background: B1 }}>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
         </div>
-        <div className="flex justify-center">
-          <div className="relative" style={{ width: 300 }}>
-            <div className="absolute inset-0 rounded-[2.5rem] blur-3xl opacity-25 scale-90" style={{ background: HERO_GRAD }} />
-            <div className="relative overflow-hidden rounded-[2.5rem] shadow-2xl" style={{ aspectRatio: '9/16', border: '3px solid rgba(26,114,232,0.18)' }}>
-              <AnimatePresence custom={direction} mode="popLayout">
-                <motion.img
-                  key={current} src={images[current]} alt={`Preview ${current + 1}`}
-                  custom={direction} variants={variants} initial="enter" animate="center" exit="exit"
-                  transition={{ duration: 0.42, ease: [0.4, 0, 0.2, 1] }}
-                  className="absolute inset-0 w-full h-full object-cover"
-                />
-              </AnimatePresence>
-              <div className="absolute bottom-5 left-0 right-0 flex justify-center gap-1.5 z-10">
-                {images.map((_, i) => (
-                  <button key={i} onClick={() => nav(i)} className="rounded-full transition-all duration-300"
-                    style={{ width: i === current ? 22 : 6, height: 6, background: i === current ? 'white' : 'rgba(255,255,255,0.45)' }} />
-                ))}
-              </div>
-              <div className="absolute top-4 right-4 z-10">
-                <span className="text-[10px] font-bold px-2.5 py-1 rounded-full text-white" style={{ background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(8px)' }}>
-                  {current + 1} / {images.length}
-                </span>
+
+        <div className="relative flex items-center justify-center" style={{ minHeight: mobile ? 350 : 510 }}>
+          {images.length ? (
+            <div className="relative w-full flex items-center justify-center" style={{ height: mobile ? 350 : 510 }}>
+              <div className="absolute w-[80%] max-w-[460px] h-[78%] rounded-full blur-3xl opacity-10" style={{ background: B1 }} />
+              {[-2, -1, 1, 2].map(offset => (
+                images.length > Math.abs(offset) && (
+                  <img key={category + offset} src={images[(current + offset + images.length) % images.length]}
+                    alt="" aria-hidden="true"
+                    className="absolute object-cover rounded-2xl border shadow-lg"
+                    style={{ height: mobile ? 270 : 390, width: mobile ? 147 : 215, left: '50%', top: '50%',
+                      transform: `translate(-50%, -50%) translateX(${offset * (mobile ? 34 : 74)}px) rotate(${offset * 7}deg)`,
+                      opacity: Math.abs(offset) === 2 ? .55 : .85, zIndex: 1, borderColor: 'rgba(25,68,241,.14)' }} />
+                )
+              ))}
+              <div className="relative overflow-hidden rounded-2xl shadow-2xl" style={{
+                height: mobile ? 317 : 465, width: mobile ? 177 : 260,
+                border: `2.5px solid ${B1}`, zIndex: 2,
+              }}>
+                <AnimatePresence mode="wait" custom={direction}>
+                  <motion.img key={category + current} src={images[current]}
+                    alt={`${category} preview ${current + 1}`}
+                    custom={direction} variants={variants} initial="enter" animate="center" exit="exit"
+                    transition={{ duration: .32 }}
+                    className="absolute inset-0 w-full h-full object-cover" />
+                </AnimatePresence>
               </div>
             </div>
-          </div>
+          ) : (
+            <div className="text-center px-6 py-8 rounded-2xl border border-dashed max-w-sm"
+              style={{ borderColor: `${B1}55`, color: T.MUTED }}>
+              <Sparkles className="w-8 h-8 mx-auto mb-3" style={{ color: B1 }} />
+              <p className="font-bold" style={{ color: T.DARK }}>{category} gallery coming soon</p>
+              <p className="text-xs mt-1">Photos for this section will be added shortly.</p>
+            </div>
+          )}
+        </div>
+
+        <div role="tablist" aria-label="Preview categories"
+          className="grid grid-cols-4 gap-1.5 sm:gap-3 mt-5">
+          {PREVIEW_CATEGORIES.map(item => {
+            const Icon = tabIcons[item];
+            const active = category === item;
+            return <button key={item} type="button" role="tab" aria-selected={active}
+              onClick={() => selectCategory(item)}
+              className="flex items-center justify-center gap-1 rounded-xl py-2.5 px-1 sm:px-3 font-extrabold whitespace-nowrap transition-colors"
+              style={{ fontSize: mobile ? 'clamp(9px, 2.6vw, 12px)' : 14,
+                background: active ? B1 : T.CARD_BG, color: active ? '#fff' : T.DARK,
+                border: `1px solid ${active ? B1 : 'rgba(25,68,241,.2)'}` }}>
+              <Icon className="w-3 h-3 sm:w-4 sm:h-4 shrink-0" />
+              {item}
+            </button>;
+          })}
         </div>
       </div>
     </section>
@@ -741,7 +759,7 @@ function MobileApp() {
         <StatsSection />
 
         {/* Gallery */}
-        <GroupPreviewSlider images={IMAGES} mobile />
+        <GroupPreviewSlider mobile />
 
         {/* Final CTA */}
         <section className="pt-2 pb-8">
