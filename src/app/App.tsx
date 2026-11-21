@@ -910,42 +910,42 @@ function MobileApp() {
 // Founder-script onboarding: the six photos are served from public/intro/.
 const INTRO_SCENES = [
   {
-    image: '/intro/i__nikki_1715514894_3366305381556228883_3585902640.jpg',
+    image: '/i__nikki_1715514894_3366305381556228883_3585902640.jpg',
     title: 'Tired of dating apps & scams online?',
     detail: '',
     emoji: '💔',
     duration: 3200,
   },
   {
-    image: '/intro/keerthiradha5996_1693489906_3181546387521500414_10375669288.jpg',
+    image: '/keerthiradha5996_1695995507_3202564893683506522_10375669288.jpg',
     title: "It's too difficult to find real dating, isn't it?",
     detail: '',
     emoji: '💬',
     duration: 3600,
   },
   {
-    image: '/intro/im_r.u.p.a._goli.__1659930973_2900033653183041738_3927231853.jpg',
+    image: '/im_r.u.p.a._goli.__1659930973_2900033653183041738_3927231853.jpg',
     title: "That's why we started Datespot.",
     detail: "No fake profiles, no time-waste, and mainly it's safe & secure!",
     emoji: '🛡️',
     duration: 4700,
   },
   {
-    image: '/intro/tanvika_annareddy_1744382697_3608466061303444094_3571364442.jpg',
+    image: '/tanvika_annareddy_1717421495_3382299111645432410_3571364442.jpg',
     title: 'Nam state bagge namge thane gothu :)',
     detail: '',
     emoji: '💛',
     duration: 3400,
   },
   {
-    image: '/intro/kalpani_akarsha_1779199904_3900533918149468044_48838473030.jpg',
+    image: '/kalpani_akarsha_1759460034_3734943935123587451_48838473030.jpg',
     title: "So if you're searching for a safe & genuine place where you can get A to Z dating services —",
     detail: '',
     emoji: '💞',
     duration: 4700,
   },
   {
-    image: '/intro/akshata_shetty_30_1781356535_3918622893767324184_1513149867.jpg',
+    image: '/akshata_shetty_30_1739801346_3570034902841689910_1513149867.jpg',
     title: 'Banni Nam group join agi!',
     detail: '',
     emoji: '🚀',
