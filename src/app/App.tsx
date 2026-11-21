@@ -279,7 +279,8 @@ function GroupPreviewSlider({ mobile = false }: { mobile?: boolean }) {
                       left: '50%', top: '50%', zIndex: 3 - distance,
                       transform: `translate(-50%, -50%) translateX(${offset * (mobile ? 46 : 58)}px) rotate(${offset * 7}deg) scale(${1 - distance * .08})`,
                       transition: 'transform .4s ease, opacity .35s ease',
-                      opacity: distance > 1 ? .72 : .9,
+                      opacity: distance > 1 ? .22 : .36,
+                      filter: distance > 1 ? 'blur(7px)' : 'blur(5px)',
                       background: 'linear-gradient(125deg, #e9edf2, #7f8897 40%, #ecf0f5 75%, #7e8896)',
                       border: '1px solid #778292' }}>
                     <div className="relative w-full h-full overflow-hidden rounded-[23px] bg-black p-[3px]">
