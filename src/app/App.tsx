@@ -1057,6 +1057,22 @@ function DatespotIntro({ onFinish }: { onFinish: () => void }) {
 }
 
 export default function App() {
+  // Deter long-press image saving and desktop right-click downloads.
+  // This does not prevent screenshots or direct access to public image URLs.
+  useEffect(() => {
+    const preventImageMenu = (event: MouseEvent) => {
+      if (event.target instanceof HTMLImageElement) event.preventDefault();
+    };
+    const preventImageDrag = (event: DragEvent) => {
+      if (event.target instanceof HTMLImageElement) event.preventDefault();
+    };
+    document.addEventListener('contextmenu', preventImageMenu);
+    document.addEventListener('dragstart', preventImageDrag);
+    return () => {
+      document.removeEventListener('contextmenu', preventImageMenu);
+      document.removeEventListener('dragstart', preventImageDrag);
+    };
+  }, []);
   const [isMobile, setIsMobile] = useState(true);
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -1068,6 +1084,12 @@ export default function App() {
   const [showIntro, setShowIntro] = useState(true);
   return (
     <ThemeProvider>
+      <style>{`img {
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        user-select: none;
+        -webkit-user-drag: none;
+      }`}</style>
       <SlotsProvider>
         {showIntro ? <DatespotIntro onFinish={() => setShowIntro(false)} /> : (isMobile
           ? <MobileApp />
