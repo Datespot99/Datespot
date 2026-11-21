@@ -907,138 +907,128 @@ function MobileApp() {
   );
 }
 
-// Animated intro — wording follows the Datespot founder's script.
+// Founder-script onboarding: the six photos are served from public/intro/.
 const INTRO_SCENES = [
   {
+    image: '/intro/i__nikki_1715514894_3366305381556228883_3585902640.jpg',
     title: 'Tired of dating apps & scams online?',
     detail: '',
     emoji: '💔',
-    side: ['📱', '⚠️'],
-    color: '#FCE7F3',
-    duration: 3100,
+    duration: 3200,
   },
   {
+    image: '/intro/keerthiradha5996_1693489906_3181546387521500414_10375669288.jpg',
     title: "It's too difficult to find real dating, isn't it?",
     detail: '',
-    emoji: '😔',
-    side: ['💭', '💬'],
-    color: '#EDE9FE',
-    duration: 3500,
+    emoji: '💬',
+    duration: 3600,
   },
   {
+    image: '/intro/im_r.u.p.a._goli.__1659930973_2900033653183041738_3927231853.jpg',
     title: "That's why we started Datespot.",
-    detail: "No Fake profiles, No timewaste, And mainly it's Safe & Secure!",
+    detail: "No fake profiles, no time-waste, and mainly it's safe & secure!",
     emoji: '🛡️',
-    side: ['✅', '💙'],
-    color: '#DBEAFE',
-    duration: 5100,
+    duration: 4700,
   },
   {
+    image: '/intro/tanvika_annareddy_1744382697_3608466061303444094_3571364442.jpg',
     title: 'Nam state bagge namge thane gothu :)',
     detail: '',
     emoji: '💛',
-    side: ['🌼', '✨'],
-    color: '#FEF3C7',
-    duration: 3100,
+    duration: 3400,
   },
   {
+    image: '/intro/kalpani_akarsha_1779199904_3900533918149468044_48838473030.jpg',
     title: "So if you're searching for a safe & genuine place where you can get A to Z dating services —",
     detail: '',
-    emoji: '💌',
-    side: ['💞', '🗨️'],
-    color: '#FCE7F3',
-    duration: 5000,
+    emoji: '💞',
+    duration: 4700,
   },
   {
+    image: '/intro/akshata_shetty_30_1781356535_3918622893767324184_1513149867.jpg',
     title: 'Banni Nam group join agi!',
     detail: '',
     emoji: '🚀',
-    side: ['💙', '🎉'],
-    color: '#DBEAFE',
     duration: 0,
   },
 ] as const;
 
 function DatespotIntro({ onFinish }: { onFinish: () => void }) {
   const [step, setStep] = useState(0);
+  const [photoFailed, setPhotoFailed] = useState(false);
   const finish = () => {
     localStorage.setItem('ds_intro_seen', '1');
     onFinish();
   };
-
   useEffect(() => {
-    // The last scene stays until the visitor selects Try Now.
     if (step === INTRO_SCENES.length - 1 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const timer = window.setTimeout(() => setStep(current => Math.min(current + 1, INTRO_SCENES.length - 1)), INTRO_SCENES[step].duration);
+    const timer = window.setTimeout(() => setStep(i => Math.min(i + 1, INTRO_SCENES.length - 1)), INTRO_SCENES[step].duration);
     return () => window.clearTimeout(timer);
   }, [step]);
+  useEffect(() => { setPhotoFailed(false); }, [step]);
 
   const scene = INTRO_SCENES[step];
+  const last = step === INTRO_SCENES.length - 1;
   return (
-    <main className="fixed inset-0 z-[1000] flex items-center justify-center overflow-hidden px-4 py-5 md:px-8 md:py-8"
-      style={{ background: 'radial-gradient(circle at 50% 25%,#DFE9FF,#FFFFFF 70%)', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-      <div className="absolute inset-0 opacity-50 pointer-events-none"
-        style={{ backgroundImage: 'radial-gradient(#B7C6F6 1px, transparent 1px)', backgroundSize: '23px 23px' }} />
-      <motion.div className="relative w-full max-w-[440px] min-h-[530px] sm:min-h-[580px] md:max-w-[700px] md:min-h-[610px] rounded-[28px] border border-[#D9E3FF] bg-white shadow-[0_24px_75px_rgba(25,68,241,.16)] flex flex-col overflow-hidden"
-        initial={{ opacity: 0, y: 20, scale: .97 }} animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ duration: .5 }}>
-        <div className="flex justify-between items-center px-6 pt-6 md:px-10 md:pt-8">
-          <span className="text-[#1944F1] text-xl md:text-2xl font-extrabold">Datespot 💙</span>
-          <button type="button" onClick={finish} className="text-xs font-bold text-[#5F6C85] px-3 py-2 rounded-lg hover:bg-[#F1F5FF]">
-            Skip
-          </button>
+    <main className="fixed inset-0 z-[1000] flex items-center justify-center overflow-y-auto px-3 py-3 md:px-8 md:py-6"
+      style={{ background: 'radial-gradient(circle at 50% 20%, #E7EFFF, #FFFFFF 70%)', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+      <div className="absolute inset-0 pointer-events-none opacity-40"
+        style={{ backgroundImage: 'radial-gradient(#AFC3F7 1px, transparent 1px)', backgroundSize: '23px 23px' }} />
+      <motion.section
+        initial={{ opacity: 0, y: 16, scale: .98 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: .45 }}
+        className="relative w-full max-w-[415px] md:max-w-[790px] rounded-[24px] bg-white border border-[#DDE6FF] shadow-[0_16px_65px_rgba(25,68,241,.13)] overflow-hidden">
+        <div className="flex items-center justify-between px-5 pt-4 pb-2 md:px-7 md:pt-5">
+          <span className="text-[#1944F1] text-lg font-extrabold tracking-tight">Datespot 💙</span>
+          <button type="button" onClick={finish}
+            className="px-3 py-1.5 text-xs font-bold text-[#64748B] rounded-lg hover:bg-[#EEF3FF]">Skip</button>
         </div>
-        <div className="flex-1 flex flex-col justify-center px-7 py-6 md:px-14 text-center" aria-live="polite">
-          <AnimatePresence mode="wait">
-            <motion.div key={step} className="flex flex-col items-center w-full"
-              initial={{ opacity: 0, x: 65, scale: .93 }}
-              animate={{ opacity: 1, x: 0, scale: 1 }}
-              exit={{ opacity: 0, x: -65, scale: .93 }}
-              transition={{ duration: .5, ease: [0.22, 1, 0.36, 1] }}>
-              <div className="w-48 h-48 md:w-56 md:h-56 relative flex items-center justify-center mb-8">
-                <motion.div className="absolute inset-3 rounded-full"
-                  style={{ background: scene.color }}
-                  animate={{ scale: [1, 1.1, 1], rotate: [-5, 5, -5] }}
-                  transition={{ duration: 3.3, repeat: Infinity, ease: 'easeInOut' }} />
-                <motion.div className="relative z-10 text-[94px] leading-none select-none"
-                  animate={{ y: [0, -13, 0], rotate: [-5, 4, -5] }}
-                  transition={{ duration: 2.8, repeat: Infinity, ease: 'easeInOut' }}
-                  role="img" aria-label="Illustration">{scene.emoji}</motion.div>
-                <motion.span className="absolute top-2 right-0 text-4xl select-none"
-                  animate={{ y: [0, -13, 0], rotate: [0, 16, 0] }}
-                  transition={{ duration: 2.2, repeat: Infinity }}>{scene.side[0]}</motion.span>
-                <motion.span className="absolute bottom-4 left-0 text-4xl select-none"
-                  animate={{ y: [0, 9, 0], rotate: [0, -14, 0] }}
-                  transition={{ duration: 2.6, repeat: Infinity }}>{scene.side[1]}</motion.span>
-              </div>
-              <h1 className="text-[23px] sm:text-[28px] md:text-[34px] leading-[1.25] font-black tracking-tight text-[#101E40]">{scene.title}</h1>
-              {scene.detail && <motion.p className="mt-5 text-[16px] md:text-[18px] font-bold leading-relaxed text-[#1944F1]"
+        <div className="flex gap-1.5 px-5 pb-3 md:px-7" aria-label={`Scene ${step + 1} of ${INTRO_SCENES.length}`}>
+          {INTRO_SCENES.map((item, i) => (
+            <button key={i} type="button" className="h-1.5 flex-1 rounded-full overflow-hidden bg-[#DDE5F6]"
+              onClick={() => setStep(i)} aria-label={`Go to scene ${i + 1}`}>
+              {i < step ? <span className="block h-full w-full bg-[#1944F1]" /> :
+                i === step ? <motion.span className="block h-full bg-[#1944F1]" key={step}
+                  initial={{ width: '0%' }} animate={{ width: '100%' }}
+                  transition={{ duration: item.duration ? item.duration / 1000 : .5, ease: 'linear' }} /> : null}
+            </button>
+          ))}
+        </div>
+        <AnimatePresence mode="wait">
+          <motion.div key={step}
+            initial={{ opacity: 0, x: 35 }} animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -35 }} transition={{ duration: .38, ease: 'easeOut' }}
+            className="px-4 pb-4 md:px-7 md:pb-7 grid md:grid-cols-[320px_minmax(0,1fr)] gap-4 md:gap-7 items-center">
+            <div className="relative rounded-[19px] overflow-hidden w-full h-[32dvh] min-h-[190px] max-h-[290px] md:h-[385px] md:max-h-none bg-gradient-to-br from-[#DAE5FF] to-[#F3F7FF]">
+              <div className="absolute inset-0 flex justify-center items-center text-7xl" aria-hidden="true">{scene.emoji}</div>
+              {!photoFailed && (
+                <motion.img src={scene.image} alt="Datespot onboarding visual"
+                  onError={() => setPhotoFailed(true)}
+                  className="relative z-10 w-full h-full object-cover object-[center_25%]"
+                  initial={{ scale: 1.04 }} animate={{ scale: 1.0 }}
+                  transition={{ duration: 3.5, ease: 'easeOut' }} />
+              )}
+              <div className="absolute z-20 bottom-0 inset-x-0 h-14 pointer-events-none bg-gradient-to-t from-[#0D2B80]/25 to-transparent" />
+            </div>
+            <div className="text-center md:text-left flex flex-col justify-center md:min-h-[290px]">
+              <motion.h1 className="text-[21px] sm:text-2xl md:text-[31px] font-black tracking-tight leading-[1.18] text-[#0E1B3B]"
                 initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: .45, duration: .45 }}>{scene.detail}</motion.p>}
-            </motion.div>
-          </AnimatePresence>
-        </div>
-        <div className="px-6 md:px-10 pb-7 md:pb-9">
-          <div className="flex gap-1.5 mb-5" aria-label={`Slide ${step + 1} of ${INTRO_SCENES.length}`}>
-            {INTRO_SCENES.map((item, i) => (
-              <button type="button" key={i} onClick={() => setStep(i)}
-                aria-label={`Go to scene ${i + 1}`}
-                className="flex-1 h-[5px] rounded-full overflow-hidden bg-[#E0E7F6]">
-                {i < step ? <span className="block w-full h-full bg-[#1944F1]" /> : i === step ? (
-                  <motion.span key={step} className="block h-full bg-[#1944F1]" initial={{ width: '0%' }}
-                    animate={{ width: '100%' }}
-                    transition={{ duration: item.duration ? item.duration / 1000 : .5, ease: 'linear' }} />
-                ) : null}
+                transition={{ delay: .13, duration: .4 }}>{scene.title}</motion.h1>
+              {scene.detail && (
+                <motion.p className="mt-2.5 md:mt-4 text-sm md:text-lg leading-relaxed font-semibold text-[#1944F1]"
+                  initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: .3, duration: .4 }}>{scene.detail}</motion.p>
+              )}
+              <button type="button"
+                onClick={() => last ? finish() : setStep(i => Math.min(i + 1, INTRO_SCENES.length - 1))}
+                className="w-full md:w-auto md:self-start rounded-xl px-7 py-3 mt-4 md:mt-7 bg-[#1944F1] text-white font-extrabold text-sm flex items-center justify-center gap-2 active:scale-[.98] transition-transform shadow-[0_6px_20px_rgba(25,68,241,.22)]">
+                {last ? 'Try Now' : 'Next'} <ArrowRight className="w-4 h-4" />
               </button>
-            ))}
-          </div>
-          <button type="button" onClick={() => step === INTRO_SCENES.length - 1 ? finish() : setStep(step + 1)}
-            className="w-full rounded-2xl py-4 text-white font-extrabold text-base flex justify-center items-center gap-2 active:scale-[.98] transition-transform"
-            style={{ background: '#1944F1', boxShadow: '0 8px 24px rgba(25,68,241,.23)' }}>
-            {step === INTRO_SCENES.length - 1 ? 'Try Now' : 'Next'} <ArrowRight className="w-5 h-5" />
-          </button>
-        </div>
-      </motion.div>
+            </div>
+          </motion.div>
+        </AnimatePresence>
+      </motion.section>
     </main>
   );
 }
