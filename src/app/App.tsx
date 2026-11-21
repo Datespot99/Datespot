@@ -33,13 +33,13 @@ const B2        = '#0F2DBB';
 const ACCENT    = '#FFD700';
 const HERO_GRAD = B1;
 
-// Matching desktop and mobile prices; UPI requests use the discounted amount.
+// The amount is ₹2,000 for UPI; display a single concise ₹2K price everywhere.
 const PRICING = {
-  desktop: { amount: '999', original: '2000' },
-  mobile:  { amount: '999', original: '2000' },
+  desktop: { amount: '2000' },
+  mobile:  { amount: '2000' },
 } as const;
 type PricingDevice = keyof typeof PRICING;
-const formatPrice = (value: string) => `₹${Number(value).toLocaleString('en-IN')}`;
+const formatPrice = (value: string) => Number(value) === 2000 ? '₹2K' : `₹${Number(value).toLocaleString('en-IN')}`;
 
 // ─── Theme system ─────────────────────────────────────────────────────────────
 const DARK_THEME = {
@@ -705,7 +705,6 @@ function StickyCTA({ onJoin }: { onJoin: () => void }) {
               style={{ background: 'rgba(255,255,255,0.14)', width: '60%' }} />
             <div className="relative flex items-center justify-center gap-2 py-3.5 px-3 whitespace-nowrap">
               <span className="font-extrabold text-white text-[clamp(11px,3.3vw,15px)] tracking-tight shrink-0">Try Now for just {formatPrice(PRICING.mobile.amount)}</span>
-              <span className="text-white/70 text-[clamp(10px,2.7vw,12px)] line-through font-semibold shrink-0">{formatPrice(PRICING.mobile.original)}</span>
               <ArrowRight className="w-4 h-4 text-white shrink-0" />
             </div>
           </motion.button>
@@ -755,7 +754,6 @@ function MobileApp() {
               <div className="flex flex-col items-center gap-1">
                 <span className="text-xs font-bold" style={{ color: T.MUTED }}>Try Now for just</span>
                 <div className="flex items-baseline gap-2 justify-center">
-                <span className="text-sm line-through font-semibold" style={{ color: T.MUTED }}>{formatPrice(PRICING.mobile.original)}</span>
                 <span className="font-black text-4xl leading-none" style={{ color: B1 }}>{formatPrice(PRICING.mobile.amount)}</span>
                 </div>
               </div>
@@ -1218,7 +1216,6 @@ function DesktopVersion({ onOpenPayment, showPayment, onClosePayment, paymentTyp
             background: T.isDark ? 'rgba(25,68,241,.075)' : 'rgba(25,68,241,.045)' }} />
         <h2 className="font-black text-4xl mb-2" style={{ color: T.DARK, letterSpacing: '-0.04em' }}>Ready to Join?</h2>
         <div className="flex items-baseline gap-3 justify-center mb-5">
-          <span className="text-lg line-through font-semibold" style={{ color: T.MUTED }}>{formatPrice(PRICING.desktop.original)}</span>
           <span className="font-black text-5xl leading-none" style={{ color: B1 }}>{formatPrice(PRICING.desktop.amount)}</span>
         </div>
         <button type="button" onClick={() => onOpenPayment('full')}
@@ -1498,7 +1495,7 @@ type UploadState = 'idle' | 'verifying' | 'success';
 function PaymentModal({ onClose, paymentType, device }: { onClose: () => void; paymentType: 'full' | 'demo'; device: PricingDevice }) {
   const { isLive, refresh, setConfirmedSlots } = useSlots();
   const UPI_ID        = 'BHARATPE2R0S0C1D6V46619@unitype';
-  const { amount: AMOUNT, original: ORIGINAL_AMT } = PRICING[device];
+  const { amount: AMOUNT } = PRICING[device];
   const TELEGRAM_LINK = 'https://t.me/+CgjgUjhztc1lNDdl';
   const upiUrl        = `upi://pay?pa=${UPI_ID}&pn=Datespot&am=${AMOUNT}&cu=INR`;
 
@@ -1562,7 +1559,6 @@ function PaymentModal({ onClose, paymentType, device }: { onClose: () => void; p
             <div className="text-[10px] mt-0.5 font-medium text-gray-400">Lifetime access · Telegram</div>
           </div>
           <div className="text-right shrink-0 mr-7">
-            {ORIGINAL_AMT && <div className="text-[11px] line-through text-gray-400">{formatPrice(ORIGINAL_AMT)}</div>}
             <div className="font-extrabold text-2xl leading-none" style={{ color: B1 }}>{formatPrice(AMOUNT)}</div>
           </div>
         </div>
