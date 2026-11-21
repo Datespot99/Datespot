@@ -1514,8 +1514,8 @@ function PaymentModal({ onClose, paymentType, device }: { onClose: () => void; p
   const UPI_ID        = 'BHARATPE2R0S0C1D6V46619@unitype';
   const { amount: AMOUNT } = PRICING[device];
   const TELEGRAM_LINK = 'https://t.me/+CgjgUjhztc1lNDdl';
-  // Deploy scripts/post-payment-leads.gs as a Google Apps Script web app and set this URL in your Vite deployment.
-  const LEADS_WEB_APP_URL = import.meta.env.VITE_POST_PAYMENT_LEADS_URL || '';
+  // Google Apps Script endpoint for post-screenshot name and phone submission.
+  const LEADS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbztOjvcCS6DkHxQvYadZQhStbwwXTYwQICgONaFxrpPqAvoP4_WpLuzmwz4thTSoqRAug/exec';
   const upiUrl        = `upi://pay?pa=${UPI_ID}&pn=Datespot&am=${AMOUNT}&cu=INR`;
 
   const [uploadState, setUploadState] = useState<UploadState>('idle');
