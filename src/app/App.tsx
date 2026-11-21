@@ -975,27 +975,27 @@ function DatespotIntro({ onFinish }: { onFinish: () => void }) {
 
   const scene = INTRO_SCENES[step];
   return (
-    <main className="fixed inset-0 z-[1000] flex items-center justify-center overflow-hidden px-4 py-5"
+    <main className="fixed inset-0 z-[1000] flex items-center justify-center overflow-hidden px-4 py-5 md:px-8 md:py-8"
       style={{ background: 'radial-gradient(circle at 50% 25%,#DFE9FF,#FFFFFF 70%)', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
       <div className="absolute inset-0 opacity-50 pointer-events-none"
         style={{ backgroundImage: 'radial-gradient(#B7C6F6 1px, transparent 1px)', backgroundSize: '23px 23px' }} />
-      <motion.div className="relative w-full max-w-[440px] min-h-[530px] sm:min-h-[580px] rounded-[28px] border border-[#D9E3FF] bg-white shadow-[0_24px_75px_rgba(25,68,241,.16)] flex flex-col overflow-hidden"
+      <motion.div className="relative w-full max-w-[440px] min-h-[530px] sm:min-h-[580px] md:max-w-[700px] md:min-h-[610px] rounded-[28px] border border-[#D9E3FF] bg-white shadow-[0_24px_75px_rgba(25,68,241,.16)] flex flex-col overflow-hidden"
         initial={{ opacity: 0, y: 20, scale: .97 }} animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: .5 }}>
-        <div className="flex justify-between items-center px-6 pt-6">
-          <span className="text-[#1944F1] text-xl font-extrabold">Datespot 💙</span>
+        <div className="flex justify-between items-center px-6 pt-6 md:px-10 md:pt-8">
+          <span className="text-[#1944F1] text-xl md:text-2xl font-extrabold">Datespot 💙</span>
           <button type="button" onClick={finish} className="text-xs font-bold text-[#5F6C85] px-3 py-2 rounded-lg hover:bg-[#F1F5FF]">
             Skip
           </button>
         </div>
-        <div className="flex-1 flex flex-col justify-center px-7 py-6 text-center" aria-live="polite">
+        <div className="flex-1 flex flex-col justify-center px-7 py-6 md:px-14 text-center" aria-live="polite">
           <AnimatePresence mode="wait">
             <motion.div key={step} className="flex flex-col items-center w-full"
               initial={{ opacity: 0, x: 65, scale: .93 }}
               animate={{ opacity: 1, x: 0, scale: 1 }}
               exit={{ opacity: 0, x: -65, scale: .93 }}
               transition={{ duration: .5, ease: [0.22, 1, 0.36, 1] }}>
-              <div className="w-48 h-48 relative flex items-center justify-center mb-8">
+              <div className="w-48 h-48 md:w-56 md:h-56 relative flex items-center justify-center mb-8">
                 <motion.div className="absolute inset-3 rounded-full"
                   style={{ background: scene.color }}
                   animate={{ scale: [1, 1.1, 1], rotate: [-5, 5, -5] }}
@@ -1011,14 +1011,14 @@ function DatespotIntro({ onFinish }: { onFinish: () => void }) {
                   animate={{ y: [0, 9, 0], rotate: [0, -14, 0] }}
                   transition={{ duration: 2.6, repeat: Infinity }}>{scene.side[1]}</motion.span>
               </div>
-              <h1 className="text-[23px] sm:text-[28px] leading-[1.25] font-black tracking-tight text-[#101E40]">{scene.title}</h1>
-              {scene.detail && <motion.p className="mt-5 text-[16px] font-bold leading-relaxed text-[#1944F1]"
+              <h1 className="text-[23px] sm:text-[28px] md:text-[34px] leading-[1.25] font-black tracking-tight text-[#101E40]">{scene.title}</h1>
+              {scene.detail && <motion.p className="mt-5 text-[16px] md:text-[18px] font-bold leading-relaxed text-[#1944F1]"
                 initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: .45, duration: .45 }}>{scene.detail}</motion.p>}
             </motion.div>
           </AnimatePresence>
         </div>
-        <div className="px-6 pb-7">
+        <div className="px-6 md:px-10 pb-7 md:pb-9">
           <div className="flex gap-1.5 mb-5" aria-label={`Slide ${step + 1} of ${INTRO_SCENES.length}`}>
             {INTRO_SCENES.map((item, i) => (
               <button type="button" key={i} onClick={() => setStep(i)}
