@@ -1507,16 +1507,21 @@ function VoiceMessageBubble({ audioSrc, isUser }: { audioSrc?: string; isUser?: 
 }
 
 // ─── Payment Modal ────────────────────────────────────────────────────────────
-type UploadState = 'idle' | 'verifying' | 'success';
+type UploadState = 'idle' | 'verifying' | 'details' | 'saving' | 'success';
 
 function PaymentModal({ onClose, paymentType, device }: { onClose: () => void; paymentType: 'full' | 'demo'; device: PricingDevice }) {
   const { isLive, refresh, setConfirmedSlots } = useSlots();
   const UPI_ID        = 'BHARATPE2R0S0C1D6V46619@unitype';
   const { amount: AMOUNT } = PRICING[device];
   const TELEGRAM_LINK = 'https://t.me/+CgjgUjhztc1lNDdl';
+  // Deploy scripts/post-payment-leads.gs as a Google Apps Script web app and set this URL in your Vite deployment.
+  const LEADS_WEB_APP_URL = import.meta.env.VITE_POST_PAYMENT_LEADS_URL || '';
   const upiUrl        = `upi://pay?pa=${UPI_ID}&pn=Datespot&am=${AMOUNT}&cu=INR`;
 
   const [uploadState, setUploadState] = useState<UploadState>('idle');
+  const [leadName, setLeadName] = useState('');
+  const [leadPhone, setLeadPhone] = useState('');
+  const [leadError, setLeadError] = useState('');
   const [tab, setTab] = useState<'qr' | 'upi'>('qr');
   // A compact one-minute countdown, without implying the payment price expires.
   const [secondsLeft, setSecondsLeft] = useState(60);
@@ -1526,9 +1531,6 @@ function PaymentModal({ onClose, paymentType, device }: { onClose: () => void; p
     return () => window.clearTimeout(id);
   }, [secondsLeft, uploadState]);
   const countdown = `${String(Math.floor(secondsLeft / 60)).padStart(2, '0')}:${String(secondsLeft % 60).padStart(2, '0')}`;
-  const redirectTimer = useRef<number | null>(null);
-  useEffect(() => () => { if (redirectTimer.current !== null) window.clearTimeout(redirectTimer.current); }, []);
-
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     e.target.value = '';
@@ -1537,22 +1539,45 @@ function PaymentModal({ onClose, paymentType, device }: { onClose: () => void; p
       toast.error('Please choose an image screenshot.');
       return;
     }
-    // Local image check only: no upload, storage or payment verification.
+    // The screenshot is inspected locally only; it is not uploaded, stored or verified as payment.
     setUploadState('verifying');
     try {
       await createImageBitmap(file).then(bitmap => bitmap.close());
+      setLeadError('');
+      setUploadState('details');
     } catch {
       setUploadState('idle');
       toast.error('Could not read this image. Please choose another screenshot.');
-      return;
     }
-    redirectTimer.current = window.setTimeout(() => {
-      setUploadState('success');
-      // Navigate in the same tab to avoid popup blockers on mobile browsers.
-      redirectTimer.current = window.setTimeout(() => { window.location.assign(TELEGRAM_LINK); }, 350);
-    }, 1500);
   };
 
+  const handleLeadSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const name = leadName.trim();
+    const phone = leadPhone.replace(/\D/g, '').replace(/^91(?=\d{10}$)/, '');
+    if (name.length < 2) { setLeadError('Enter your name.'); return; }
+    if (!/^[6-9]\d{9}$/.test(phone)) { setLeadError('Enter a valid 10-digit Indian mobile number.'); return; }
+    if (!LEADS_WEB_APP_URL) {
+      setLeadError('Registration is temporarily unavailable. Please contact Telegram support.');
+      return;
+    }
+    setLeadError('');
+    setUploadState('saving');
+    try {
+      const params = new URLSearchParams({
+        name, phone, amount: AMOUNT,
+        source: device, screenshotSelected: 'Yes',
+      });
+      // Apps Script web apps require an opaque no-cors POST from the browser.
+      // A completed fetch does not confirm the sheet write or payment.
+      await fetch(LEADS_WEB_APP_URL, { method: 'POST', mode: 'no-cors', body: params });
+      setUploadState('success');
+      window.setTimeout(() => window.location.assign(TELEGRAM_LINK), 900);
+    } catch {
+      setUploadState('details');
+      setLeadError('Could not submit your details. Please check your connection and retry.');
+    }
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-lg p-4">
@@ -1660,18 +1685,55 @@ function PaymentModal({ onClose, paymentType, device }: { onClose: () => void; p
             <div className="text-center py-8" role="status">
               <Loader2 className="w-9 h-9 animate-spin mx-auto mb-3" style={{ color: B1 }} />
               <p className="font-bold text-gray-900">Checking screenshot...</p>
-              <p className="text-xs text-gray-500 mt-1">Preparing your Telegram invite</p>
+              <p className="text-xs text-gray-500 mt-1">Next, enter your name and mobile number</p>
+            </div>
+          )}
+          {uploadState === 'details' && (
+            <form className="py-5 space-y-4" onSubmit={handleLeadSubmit}>
+              <div className="text-center">
+                <CheckCircle className="w-9 h-9 mx-auto mb-2" style={{ color: B1 }} />
+                <h2 className="text-lg font-extrabold text-gray-900">One last step</h2>
+                <p className="text-xs text-gray-500 mt-1">Screenshot selected. Enter your details to continue to Telegram.</p>
+              </div>
+              <div>
+                <label htmlFor="post-payment-name" className="block text-xs font-bold text-gray-700 mb-1.5">Your name</label>
+                <input id="post-payment-name" type="text" autoComplete="name" required maxLength={80}
+                  value={leadName} onChange={e => setLeadName(e.target.value)}
+                  placeholder="Enter your name" className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm text-gray-900 outline-none focus:border-blue-500" />
+              </div>
+              <div>
+                <label htmlFor="post-payment-phone" className="block text-xs font-bold text-gray-700 mb-1.5">Mobile number</label>
+                <div className="flex items-center rounded-xl border border-gray-300 overflow-hidden focus-within:border-blue-500">
+                  <span className="px-3 py-3 bg-gray-50 text-sm font-bold text-gray-600 border-r border-gray-200">+91</span>
+                  <input id="post-payment-phone" type="tel" autoComplete="tel-national" inputMode="numeric" required
+                    maxLength={10} value={leadPhone} onChange={e => setLeadPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                    placeholder="10-digit mobile number" className="flex-1 min-w-0 px-3 py-3 text-sm text-gray-900 outline-none" />
+                </div>
+              </div>
+              {leadError && <p role="alert" className="text-xs text-red-600 font-semibold">{leadError}</p>}
+              <button type="submit" className="w-full py-3 rounded-xl text-white text-sm font-bold flex items-center justify-center gap-2" style={{ background: B1 }}>
+                Continue to Telegram <ArrowRight className="w-4 h-4" />
+              </button>
+              <p className="text-[10px] text-center text-gray-500">Your details will be submitted for group access. Payment is not automatically verified. The screenshot is not stored.</p>
+              {!LEADS_WEB_APP_URL && <a className="block text-center text-xs font-bold" style={{ color: B1 }} href="https://t.me/subhash8055g" target="_blank" rel="noopener noreferrer">Contact Telegram support</a>}
+            </form>
+          )}
+          {uploadState === 'saving' && (
+            <div className="text-center py-8" role="status">
+              <Loader2 className="w-9 h-9 animate-spin mx-auto mb-3" style={{ color: B1 }} />
+              <p className="font-bold text-gray-900">Submitting your details...</p>
+              <p className="text-xs text-gray-500 mt-1">Please don't close this page</p>
             </div>
           )}
           {uploadState === 'success' && (
             <div className="text-center py-7" role="status">
               <CheckCircle className="w-10 h-10 mx-auto mb-3" style={{ color: B1 }} />
-              <p className="font-bold text-gray-900">Opening Telegram group...</p>
+              <p className="font-bold text-gray-900">Details sent. Opening Telegram...</p>
               <p className="text-xs text-gray-500 mt-1 mb-4">If Telegram doesn't open, use the button below.</p>
               <a href={TELEGRAM_LINK} className="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-white font-bold text-sm" style={{ background: B1 }}>
                 <Send className="w-4 h-4" /> Open Telegram Group <ExternalLink className="w-3.5 h-3.5" />
               </a>
-              <p className="text-[10px] text-gray-500 mt-3">Screenshot is not uploaded or stored. Payment is not automatically verified.</p>
+              <p className="text-[10px] text-gray-500 mt-3">Screenshot is not uploaded or stored. Submission and payment are not independently verified.</p>
             </div>
           )}
 
