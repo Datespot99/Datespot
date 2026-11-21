@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { SHEET_URL, SlotsProvider, useSlots, waitForScreenshotReceipt } from './slots';
 
-// Lead-only Apps Script endpoint. Screenshot/slot backend remains disconnected.
-const LEADS_URL = 'https://script.google.com/macros/s/AKfycbz_tLVlDU-Vsgu2xQtBtpdfpzXYukEdalfGFRWXQ4d1TUkC4Lk8kUSox0F0jOCWHLNzbw/exec';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   Play, Pause, Users, X, Star, Mic, Upload, CheckCircle, Loader2,
@@ -274,108 +272,6 @@ function GroupPreviewSlider({ images, mobile = false }: { images: string[]; mobi
         </div>
       </div>
     </section>
-  );
-}
-
-// ─── Lead Modal ───────────────────────────────────────────────────────────────
-
-function LeadModal({ onClose, onComplete, gate = false }: { onClose?: () => void; onComplete: () => void; gate?: boolean }) {
-  const [name, setName]       = useState('');
-  const [telegram, setTelegram] = useState('');
-  const [city, setCity] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError]     = useState('');
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    if (!name.trim()) { setError('Please enter your full name.'); return; }
-    if (!telegram.trim()) { setError('Please enter your Telegram ID or number.'); return; }
-    if (!city.trim()) { setError('Please enter your city name.'); return; }
-    if (!LEADS_URL) { setError('Registration is temporarily unavailable. Please try again later.'); return; }
-    setLoading(true);
-    try {
-      const params = new URLSearchParams({ name: name.trim(), telegram: telegram.trim(), city: city.trim() });
-      await fetch(`${LEADS_URL}?${params.toString()}`, { mode: 'no-cors' });
-      localStorage.setItem('ds_lead_submitted', '1');
-      localStorage.setItem('ds_lead_name', name.trim());
-      localStorage.setItem('ds_lead_telegram', telegram.trim());
-      localStorage.setItem('ds_lead_city', city.trim());
-      onComplete();
-    } catch {
-      setError('Something went wrong. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <div className={`fixed inset-0 z-[999] flex items-center justify-center overflow-y-auto overflow-x-hidden px-4 py-3 sm:px-5 ${gate ? '' : 'bg-black/70'}`}
-      style={{
-        fontFamily: "'Plus Jakarta Sans', sans-serif",
-        backgroundColor: '#FFFFFF',
-        backgroundImage: "radial-gradient(ellipse 60% 50% at 50% 42%,rgba(25,68,241,.07),transparent 75%),radial-gradient(circle,rgba(25,68,241,.16) 1px,transparent 1px)",
-        backgroundSize: 'auto, 22px 22px',
-      }}>
-      <motion.div className="absolute inset-0" initial={{ opacity: 0 }} animate={{ opacity: 1 }} onClick={gate ? undefined : onClose} />
-
-      <div className="relative z-10 w-full max-w-[440px] max-h-[96dvh] overflow-y-auto sm:max-h-none sm:overflow-visible flex flex-col items-center gap-3 sm:block">
-      <motion.div
-        initial={{ opacity: 0, y: 22, scale: 0.96 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        exit={{ opacity: 0, y: 12, scale: 0.97 }}
-        transition={{ duration: 0.36, ease: [0.16, 1, 0.3, 1] }}
-        role="dialog" aria-modal="true" aria-label="Enter your details"
-        className="relative w-full max-w-[440px] rounded-[22px] sm:rounded-[24px] overflow-hidden shrink-0"
-        style={{ background: '#FFFFFF', border: '1px solid #DFE5F2', boxShadow: '0 24px 65px rgba(25,50,105,.12)' }}>
-        {!gate && <button onClick={onClose} aria-label="Close" className="absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center hover:bg-white/10">
-          <X className="w-4 h-4" style={{ color: '#9CA9C5' }} />
-        </button>}
-        <div className="px-5 py-5 sm:px-9 sm:py-9">
-          <div className="flex justify-center items-center gap-2 mb-4 sm:mb-7">
-            <span className="font-extrabold text-[#1944F1] text-2xl tracking-tight">Namaskara 🙏</span>
-          </div>
-          <div className="text-center mb-5 sm:mb-6">
-            <h2 className="text-xl sm:text-2xl font-extrabold text-[#15223B] tracking-tight mb-1.5">Welcome to Datespot</h2>
-            <p className="text-xs sm:text-sm" style={{ color: '#66748C' }}>Enter your details to open Datespot.</p>
-          </div>
-          <form onSubmit={handleSubmit} className="flex flex-col gap-3.5 sm:gap-4">
-            <div>
-              <label htmlFor="ds-signup-name" className="block text-[11px] font-bold uppercase tracking-wider mb-2" style={{ color: '#34425A' }}>Full Name <span className="normal-case tracking-normal font-medium text-[#66748C]">(Anonymous names are welcome)</span></label>
-              <input id="ds-signup-name" type="text" autoComplete="name" placeholder="Enter your full name"
-                value={name} onChange={e => setName(e.target.value)}
-                className="w-full rounded-xl px-4 py-3 sm:py-3.5 outline-none text-sm font-semibold transition-all"
-                style={{ background: '#F8FAFF', border: `1px solid ${name ? '#1944F1' : '#D6DEED'}`, color: '#1A2940', caretColor: '#1944F1' }} />
-            </div>
-             <div>
-               <label htmlFor="ds-signup-telegram" className="block text-[11px] font-bold mb-2" style={{ color: '#34425A' }}>Telegram ID <span className="font-medium text-[#66748C]">(Safe &amp; more secure than WhatsApp)</span></label>
-               <input id="ds-signup-telegram" type="text" autoComplete="off" placeholder="Enter Telegram ID or number"
-                 value={telegram} onChange={e => setTelegram(e.target.value)}
-                 className="w-full rounded-xl px-4 py-3 sm:py-3.5 outline-none text-sm font-semibold transition-all"
-                 style={{ background: '#F8FAFF', border: `1px solid ${telegram ? '#1944F1' : '#D6DEED'}`, color: '#1A2940', caretColor: '#1944F1' }} />
-             </div>
-             <div>
-               <label htmlFor="ds-signup-city" className="block text-[11px] font-bold mb-2" style={{ color: '#34425A' }}>City Name <span className="font-medium text-[#66748C]">(Important Bigulu!!)</span></label>
-               <input id="ds-signup-city" type="text" autoComplete="address-level2" placeholder="Enter your city name"
-                 value={city} onChange={e => setCity(e.target.value)}
-                 className="w-full rounded-xl px-4 py-3 sm:py-3.5 outline-none text-sm font-semibold transition-all"
-                 style={{ background: '#F8FAFF', border: `1px solid ${city ? '#1944F1' : '#D6DEED'}`, color: '#1A2940', caretColor: '#1944F1' }} />
-             </div>
-            {error && (
-              <motion.p initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }}
-                className="text-xs font-semibold text-red-700 bg-red-50 px-3 py-2 rounded-lg"
-                style={{ border: '1px solid rgba(239,68,68,.3)' }}>{error}</motion.p>
-            )}
-            <button type="submit" disabled={loading}
-              className="w-full rounded-xl py-3 sm:py-3.5 mt-1 font-extrabold text-sm flex items-center justify-center gap-2 transition-transform active:scale-[.98] disabled:opacity-70"
-              style={{ background: '#1944F1', color: '#FFFFFF', boxShadow: '0 6px 22px rgba(25,68,241,.25)' }}>
-              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <><span>{gate ? 'Continue' : 'Continue to Payment'}</span><ArrowRight className="w-4 h-4" /></>}
-            </button>
-            <p className="text-center text-[11px] font-medium" style={{ color: '#62718A' }}>🛡️ Your privacy is our priority!</p>
-          </form>
-        </div>
-      </motion.div>
-      </div>
-    </div>
   );
 }
 
@@ -823,18 +719,13 @@ function StickyCTA({ onJoin }: { onJoin: () => void }) {
 function MobileApp() {
   const T = useT();
   const [showPayment, setShowPayment] = useState(false);
-  const [showLead,    setShowLead]    = useState(false);
   const [showChat,    setShowChat]    = useState(false);
   const [paymentType, setPaymentType] = useState<'full' | 'demo'>('full');
   const constraintsRef = useRef<HTMLDivElement>(null);
 
   const handleJoin = (type: 'full' | 'demo') => {
     setPaymentType(type);
-    if (localStorage.getItem('ds_lead_submitted') === '1') {
-      setShowPayment(true);
-    } else {
-      setShowLead(true);
-    }
+    setShowPayment(true);
   };
 
   return (
@@ -941,7 +832,6 @@ function MobileApp() {
       <StickyCTA onJoin={() => handleJoin('full')} />
 
       <AnimatePresence>
-        {showLead    && <LeadModal onClose={() => setShowLead(false)} onComplete={() => { setShowLead(false); setShowPayment(true); }} />}
         {showPayment && <PaymentModal onClose={() => setShowPayment(false)} paymentType={paymentType} device="mobile" />}
         {showChat    && <ChatOverlay onClose={() => setShowChat(false)} onOpenPayment={() => handleJoin('full')} />}
       </AnimatePresence>
@@ -1088,24 +978,7 @@ export default function App() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  const [entered, setEntered] = useState(() => localStorage.getItem('ds_lead_submitted') === '1');
   const [showIntro, setShowIntro] = useState(() => new URLSearchParams(window.location.search).get('intro') === '1');
-  if (!entered) {
-    return (
-      <ThemeProvider>
-        <SlotsProvider>
-          <div className="min-h-screen w-full relative" style={{
-            backgroundColor: '#000000',
-            backgroundImage: 'radial-gradient(ellipse 60% 50% at 50% 45%, rgba(25,68,241,0.18), transparent 70%), radial-gradient(rgba(255,255,255,0.16) 1px, transparent 1.2px)',
-            backgroundSize: '100% 100%, 24px 24px',
-          }}>
-            <LeadModal gate onComplete={() => { setShowIntro(true); setEntered(true); }} />
-          </div>
-        </SlotsProvider>
-      </ThemeProvider>
-    );
-  }
-
   return (
     <ThemeProvider>
       <SlotsProvider>
@@ -1119,22 +992,14 @@ export default function App() {
 
 function DesktopWrapper() {
   const [showPayment, setShowPayment] = useState(false);
-  const [showLead,    setShowLead]    = useState(false);
   const [paymentType, setPaymentType] = useState<'full' | 'demo'>('full');
   const handleJoin = (type: 'full' | 'demo') => {
     setPaymentType(type);
-    if (localStorage.getItem('ds_lead_submitted') === '1') {
-      setShowPayment(true);
-    } else {
-      setShowLead(true);
-    }
+    setShowPayment(true);
   };
   return (
     <>
       <DesktopVersion onOpenPayment={handleJoin} showPayment={showPayment} onClosePayment={() => setShowPayment(false)} paymentType={paymentType} />
-      <AnimatePresence>
-        {showLead && <LeadModal onClose={() => setShowLead(false)} onComplete={() => { setShowLead(false); setShowPayment(true); }} />}
-      </AnimatePresence>
     </>
   );
 }
