@@ -668,18 +668,44 @@ function TrustProof() {
 }
 
 // ─── FAQ ──────────────────────────────────────────────────────────────────────
+
+// Member-attributed FAQ responses supplied by the Datespot team.
+const MEMBER_FAQ = [
+  {
+    "q": "Is Datespot genuine?",
+    "a": "Yes it's genuine using it since last one year & met many beautiful women",
+    "by": "Lohith gowda"
+  },
+  {
+    "q": "Can I speak to someone before joining?",
+    "a": "You can speak with admins before joining, but they won't directly let you speak with girls before joining",
+    "by": "Mohan Kumar"
+  },
+  {
+    "q": "How does joining works?",
+    "a": "Pay entry fee and upload screenshot it will automatically redirects you to telegram. Pay madbekadre tension aguthe madidmale maja baruthe adu bare vishya :)",
+    "by": "Rajesh"
+  },
+  {
+    "q": "Are members verified?",
+    "a": "Yep everyone are real girls that's the best part of this group",
+    "by": "Arun aru"
+  },
+  {
+    "q": "Is the membership fee refundable?",
+    "a": "No i seen that they refund only in group services money, entry fee is non refundable",
+    "by": "Kalyan Shetty"
+  },
+  {
+    "q": "Is this worth trying? Can i get dating or even more then that?",
+    "a": "Deffiently Worth varma worth!!, this is more then dating and you will realise once you joined.",
+    "by": "Rajesh"
+  }
+];
 function FAQ() {
   const T = useT();
   const [open, setOpen] = useState<number | null>(null);
-  const items = [
-    { q: 'Is Datespot genuine?', a: "Datespot is a Telegram dating community. If you're new, chat with the admin first and check how the group works before deciding to join." },
-    { q: 'Can I speak to someone before paying?', a: "Of course! You can message @subhash8055g on Telegram. Ask anything about joining, fees or what happens after payment." },
-    { q: 'How does joining work?', a: "It's pretty simple: enter your name, Telegram ID and city, check the payment details, then select your payment screenshot. If you need help getting access, message the admin." },
-    { q: 'Are members verified?', a: "The group has an admin-led membership process, but it's smart to stay careful online. Nobody can promise every profile is genuine, so don't share private information with strangers." },
-    { q: 'What if I pay but cannot access the group?', a: "Don't worry about figuring it out alone. Send @subhash8055g your payment reference or screenshot and ask for help. Never send your OTP or banking password." },
-    { q: 'Are my registration details private?', a: "You can ask the admin exactly how signup details are used and stored before joining. And remember, keep personal information out of public chats." },
-    { q: 'Is the membership fee refundable?', a: "It's best to confirm the refund rules with the admin before paying. Don't assume a refund is available unless the terms say so." },
-  ];
+  const items = MEMBER_FAQ;
 
   return (
     <section className="py-3" aria-labelledby="trust-faq-heading">
@@ -698,7 +724,8 @@ function FAQ() {
             </button>
             {open === i && (
               <div id={`trust-faq-answer-${i}`} className="px-3.5 pb-3 text-[11px] sm:text-xs leading-relaxed" style={{ color: T.MUTED }}>
-                {item.a}
+                <p className="italic">&ldquo;{item.a}&rdquo;</p>
+                <p className="font-extrabold mt-1.5" style={{ color: B1 }}>~ {item.by}</p>
               </div>
             )}
           </div>
@@ -1279,13 +1306,7 @@ function DesktopHero() {
 function DesktopFAQ() {
   const T = useT();
   const [open, setOpen] = useState<number | null>(0);
-  const items = [
-    { q: 'Is Datespot genuine?', a: "It's a Bengaluru-based Telegram dating community with an admin-led joining process. Ask the admin how it works and make sure it's right for you." },
-    { q: 'How do I get access?', a: `First enter your details, then make the ${formatPrice(PRICING.desktop.amount)} UPI payment and select your payment screenshot. You'll then be directed toward the Telegram invite. Contact the admin if access doesn't work.` },
-    { q: 'What is included in membership?', a: "The group is built around chatting and meeting new people. Ask the admin which activities, calls or other services are currently included before paying." },
-    { q: 'Can I use any UPI app?', a: "Yes, a compatible UPI app should work. Just scan the QR code or use the UPI ID on the payment screen and double-check the details before paying." },
-    { q: 'Is it a one-time fee?', a: `The joining price shown is ${formatPrice(PRICING.desktop.amount)} instead of ${formatPrice(PRICING.desktop.original)}. For the current membership terms and any renewal conditions, check with the admin.` },
-  ];
+  const items = MEMBER_FAQ;
   return (
     <div>
       <div className="text-center mb-8">
@@ -1306,7 +1327,8 @@ function DesktopFAQ() {
             {open === i && (
               <div id={'desktop-faq-answer-' + i} className="px-6 pb-5 -mt-1 text-sm leading-relaxed"
                 style={{ color: T.MUTED }}>
-                {item.a}
+                <p className="italic">&ldquo;{item.a}&rdquo;</p>
+                <p className="font-extrabold mt-2" style={{ color: B1 }}>~ {item.by}</p>
               </div>
             )}
           </div>
