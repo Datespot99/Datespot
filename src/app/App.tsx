@@ -978,7 +978,7 @@ export default function App() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  const [showIntro, setShowIntro] = useState(() => new URLSearchParams(window.location.search).get('intro') === '1');
+  const [showIntro, setShowIntro] = useState(true);
   return (
     <ThemeProvider>
       <SlotsProvider>
