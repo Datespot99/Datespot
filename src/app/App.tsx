@@ -1135,7 +1135,7 @@ function DesktopHero() {
             </div>
           </div>
 
-          <div className="relative w-full h-[clamp(245px,28vw,355px)] mt-2" aria-label="Rotating group photo previews">
+          <div className="relative w-full h-[clamp(330px,34vw,455px)] mt-4" aria-label="Rotating group photo previews">
             <div aria-hidden="true" className="pointer-events-none absolute rounded-full"
               style={{ width: '79%', height: '78%', left: '11%', top: '11%',
                 background: T.isDark ? 'rgba(25,68,241,.11)' : 'rgba(25,68,241,.055)' }} />
@@ -1160,28 +1160,37 @@ function DesktopHero() {
                   aria-hidden={!visible} tabIndex={visible ? 0 : -1}
                   className="absolute top-1/2 overflow-hidden rounded-[17px] lg:rounded-[22px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4"
                   style={{
-                    left: `${50 + offset * 16}%`,
-                    width: 'clamp(108px,11.8vw,178px)',
-                    aspectRatio: '0.66',
-                    transform: `translate(-50%,-50%) translateY(${distance * 5}px) rotate(${offset * 5}deg) scale(${1 - distance * .085})`,
+                    left: `${50 + offset * 18}%`,
+                    width: offset === 0 ? 'clamp(156px,15.8vw,232px)' : 'clamp(130px,13.6vw,196px)',
+                    aspectRatio: '0.58',
+                    transform: `translate(-50%,-50%) translateY(${distance * 9}px) rotate(${offset * 5}deg) scale(${1 - distance * .085})`,
                     transition: 'left .55s cubic-bezier(.22,1,.36,1),transform .55s cubic-bezier(.22,1,.36,1),opacity .35s ease',
                     opacity: visible ? (distance === 2 ? .9 : 1) : 0,
                     zIndex: visible ? 10 - distance : 0,
                     pointerEvents: visible ? 'auto' : 'none',
-                    background: '#101729',
-                    border: offset === 0 ? `2px solid ${B1}` : '2px solid rgba(255,255,255,.8)',
+                    background: '#FFFFFF',
+                    border: offset === 0 ? `4px solid ${B1}` : '4px solid rgba(230,235,250,.98)',
                     boxShadow: offset === 0
                       ? '0 14px 30px rgba(25,68,241,.22)'
                       : '0 8px 22px rgba(14,25,62,.13)',
                   }}>
-                  <img src={src} alt={`Group preview ${i + 1}`}
-                    className="block w-full h-full object-cover" loading={distance < 2 ? 'eager' : 'lazy'} />
+                  <div className="relative h-full w-full flex flex-col bg-white">
+                    <div className="shrink-0 h-5 flex items-center justify-center bg-white relative">
+                      <div className="w-12 h-1.5 rounded-full bg-slate-200" />
+                    </div>
+                    <img src={src} alt={`${category} preview ${i + 1}`}
+                      className="block w-full flex-1 min-h-0 object-contain bg-white"
+                      loading={distance < 2 ? 'eager' : 'lazy'} />
+                    <div className="shrink-0 h-4 flex items-center justify-center bg-white">
+                      <div className="w-14 h-1 rounded-full bg-slate-300" />
+                    </div>
+                  </div>
                 </button>
               );
             })}
           </div>
 
-          <div className="flex items-center justify-center gap-2 mt-1">
+          <div className="flex items-center justify-center gap-2 mt-3">
             {images.map((_, i) => (
               <button key={i} type="button" onClick={() => setPreviewIndex(i)}
                 aria-label={`Show group preview ${i + 1}`}
