@@ -241,25 +241,41 @@ function GroupPreviewSlider({ mobile = false }: { mobile?: boolean }) {
               <div className="absolute w-[80%] max-w-[460px] h-[78%] rounded-full blur-3xl opacity-10" style={{ background: B1 }} />
               {[-2, -1, 1, 2].map(offset => (
                 images.length > Math.abs(offset) && (
-                  <img key={category + offset} src={images[(current + offset + images.length) % images.length]}
-                    alt="" aria-hidden="true"
-                    className="absolute object-cover rounded-2xl border shadow-lg"
-                    style={{ height: mobile ? 270 : 390, width: mobile ? 147 : 215, left: '50%', top: '50%',
-                      transform: `translate(-50%, -50%) translateX(${offset * (mobile ? 34 : 74)}px) rotate(${offset * 7}deg)`,
-                      opacity: Math.abs(offset) === 2 ? .55 : .85, zIndex: 1, borderColor: 'rgba(25,68,241,.14)' }} />
+                  <div key={category + offset} aria-hidden="true"
+                    className="absolute overflow-hidden rounded-[20px] border-2 shadow-lg bg-white flex flex-col"
+                    style={{ height: mobile ? 274 : 390, width: mobile ? 150 : 215, left: '50%', top: '50%',
+                      transform: `translate(-50%, -50%) translateX(${offset * (mobile ? 39 : 74)}px) rotate(${offset * 6}deg)`,
+                      opacity: Math.abs(offset) === 2 ? .55 : .85, zIndex: 1, borderColor: 'rgba(225,232,250,.95)' }}>
+                    <div className="h-4 shrink-0 bg-white flex items-center justify-center">
+                      <div className="w-9 h-1 rounded-full bg-slate-200" />
+                    </div>
+                    <img src={images[(current + offset + images.length) % images.length]}
+                      alt="" className="w-full flex-1 min-h-0 object-contain bg-white" />
+                    <div className="h-3 shrink-0 bg-white flex items-center justify-center">
+                      <div className="w-10 h-1 rounded-full bg-slate-300" />
+                    </div>
+                  </div>
                 )
               ))}
-              <div className="relative overflow-hidden rounded-2xl shadow-2xl" style={{
-                height: mobile ? 317 : 465, width: mobile ? 177 : 260,
-                border: `2.5px solid ${B1}`, zIndex: 2,
+              <div className="relative overflow-hidden rounded-[22px] shadow-2xl bg-white flex flex-col" style={{
+                height: mobile ? 326 : 465, width: mobile ? 184 : 260,
+                border: `3px solid ${B1}`, zIndex: 2,
               }}>
-                <AnimatePresence mode="wait" custom={direction}>
-                  <motion.img key={category + current} src={images[current]}
-                    alt={`${category} preview ${current + 1}`}
-                    custom={direction} variants={variants} initial="enter" animate="center" exit="exit"
-                    transition={{ duration: .32 }}
-                    className="absolute inset-0 w-full h-full object-cover" />
-                </AnimatePresence>
+                <div className="h-5 shrink-0 flex items-center justify-center bg-white">
+                  <div className="w-12 h-1.5 rounded-full bg-slate-200" />
+                </div>
+                <div className="relative flex-1 min-h-0 overflow-hidden bg-white">
+                  <AnimatePresence mode="wait" custom={direction}>
+                    <motion.img key={category + current} src={images[current]}
+                      alt={`${category} preview ${current + 1}`}
+                      custom={direction} variants={variants} initial="enter" animate="center" exit="exit"
+                      transition={{ duration: .32 }}
+                      className="absolute inset-0 w-full h-full object-contain bg-white" />
+                  </AnimatePresence>
+                </div>
+                <div className="h-4 shrink-0 flex items-center justify-center bg-white">
+                  <div className="w-14 h-1 rounded-full bg-slate-300" />
+                </div>
               </div>
             </div>
           ) : (
@@ -271,6 +287,18 @@ function GroupPreviewSlider({ mobile = false }: { mobile?: boolean }) {
             </div>
           )}
         </div>
+
+        {images.length > 0 && (
+          <div className="flex items-center justify-center gap-1.5 mt-1" aria-label="Image position">
+            {images.map((_, i) => (
+              <button key={i} type="button" onClick={() => { setDirection(i > current ? 1 : -1); setCurrent(i); }}
+                aria-label={`Show ${category} image ${i + 1}`} aria-current={i === current ? 'true' : undefined}
+                className="rounded-full transition-all duration-300"
+                style={{ width: i === current ? 18 : 6, height: 6,
+                  background: i === current ? B1 : (T.isDark ? '#47547D' : '#C5D2F9') }} />
+            ))}
+          </div>
+        )}
 
         <div role="tablist" aria-label="Preview categories"
           className="grid grid-cols-4 gap-1.5 sm:gap-3 mt-5">
