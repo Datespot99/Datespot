@@ -33,13 +33,13 @@ const B2        = '#0F2DBB';
 const ACCENT    = '#FFD700';
 const HERO_GRAD = B1;
 
-// The amount is ₹2,000 for UPI; display a single concise ₹2K price everywhere.
+// Shared one-time price for desktop, mobile and UPI payments.
 const PRICING = {
-  desktop: { amount: '2000' },
-  mobile:  { amount: '2000' },
+  desktop: { amount: '499' },
+  mobile:  { amount: '499' },
 } as const;
 type PricingDevice = keyof typeof PRICING;
-const formatPrice = (value: string) => Number(value) === 2000 ? '₹2K' : `₹${Number(value).toLocaleString('en-IN')}`;
+const formatPrice = (value: string) => `₹${Number(value).toLocaleString('en-IN')}`;
 
 // ─── Theme system ─────────────────────────────────────────────────────────────
 const DARK_THEME = {
