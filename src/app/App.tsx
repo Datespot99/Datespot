@@ -907,74 +907,139 @@ function MobileApp() {
   );
 }
 
-// Short, skippable introduction shown once immediately after registration.
+// Animated intro — wording follows the Datespot founder's script.
 const INTRO_SCENES = [
-  { title: 'Tired of dating apps & online scams?', detail: 'Finding genuine dating connections can feel difficult, isn’t it?', emoji: '💔', color: '#FCE7F3' },
-  { title: 'Real dating should feel easier.', detail: 'Less confusion. More meaningful conversations.', emoji: '💬', color: '#EDE9FE' },
-  { title: 'That’s why we started Datespot!', detail: 'A community focused on genuine connections, less time-wasting and privacy.', emoji: '🛡️', color: '#DBEAFE' },
-  { title: 'Nam state bagge namge thane gothu :)', detail: 'Made with a local touch — for people who understand our vibe!', emoji: '💛', color: '#FEF3C7' },
-  { title: 'A to Z dating services', detail: 'Looking for a place to connect, chat and explore dating? You’re in the right place.', emoji: '💞', color: '#FCE7F3' },
-  { title: 'Banni, nam group join agi!', detail: 'Welcome to Datespot. Your next connection could start here.', emoji: '🚀', color: '#DBEAFE' },
+  {
+    title: 'Tired of dating apps & scams online?',
+    detail: '',
+    emoji: '💔',
+    side: ['📱', '⚠️'],
+    color: '#FCE7F3',
+    duration: 3100,
+  },
+  {
+    title: "It's too difficult to find real dating, isn't it?",
+    detail: '',
+    emoji: '😔',
+    side: ['💭', '💬'],
+    color: '#EDE9FE',
+    duration: 3500,
+  },
+  {
+    title: "That's why we started Datespot.",
+    detail: "No Fake profiles, No timewaste, And mainly it's Safe & Secure!",
+    emoji: '🛡️',
+    side: ['✅', '💙'],
+    color: '#DBEAFE',
+    duration: 5100,
+  },
+  {
+    title: 'Nam state bagge namge thane gothu :)',
+    detail: '',
+    emoji: '💛',
+    side: ['🌼', '✨'],
+    color: '#FEF3C7',
+    duration: 3100,
+  },
+  {
+    title: "So if you're searching for a safe & genuine place where you can get A to Z dating services —",
+    detail: '',
+    emoji: '💌',
+    side: ['💞', '🗨️'],
+    color: '#FCE7F3',
+    duration: 5000,
+  },
+  {
+    title: 'Banni Nam group join agi!',
+    detail: '',
+    emoji: '🚀',
+    side: ['💙', '🎉'],
+    color: '#DBEAFE',
+    duration: 0,
+  },
 ] as const;
 
 function DatespotIntro({ onFinish }: { onFinish: () => void }) {
   const [step, setStep] = useState(0);
-  const [paused, setPaused] = useState(false);
   const finish = () => {
     localStorage.setItem('ds_intro_seen', '1');
     onFinish();
   };
+
   useEffect(() => {
-    if (paused || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const timer = window.setTimeout(() => {
-      if (step === INTRO_SCENES.length - 1) finish();
-      else setStep(i => i + 1);
-    }, step === INTRO_SCENES.length - 1 ? 3400 : 2800);
+    // The last scene stays until the visitor selects Try Now.
+    if (step === INTRO_SCENES.length - 1 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const timer = window.setTimeout(() => setStep(current => Math.min(current + 1, INTRO_SCENES.length - 1)), INTRO_SCENES[step].duration);
     return () => window.clearTimeout(timer);
-  }, [step, paused]);
+  }, [step]);
+
   const scene = INTRO_SCENES[step];
   return (
-    <div className="fixed inset-0 z-[1000] flex items-center justify-center overflow-hidden px-4 py-6"
-      style={{ background: 'radial-gradient(circle at 50% 35%,#E8EEFF,#FFFFFF 65%)', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-      <div className="absolute inset-0 pointer-events-none opacity-50" style={{ backgroundImage: 'radial-gradient(#B6C6FF 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
-      <div className="relative w-full max-w-[420px] min-h-[490px] sm:min-h-[550px] rounded-[30px] border border-[#D9E3FF] bg-white shadow-[0_22px_80px_rgba(25,68,241,.12)] flex flex-col overflow-hidden">
+    <main className="fixed inset-0 z-[1000] flex items-center justify-center overflow-hidden px-4 py-5"
+      style={{ background: 'radial-gradient(circle at 50% 25%,#DFE9FF,#FFFFFF 70%)', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+      <div className="absolute inset-0 opacity-50 pointer-events-none"
+        style={{ backgroundImage: 'radial-gradient(#B7C6F6 1px, transparent 1px)', backgroundSize: '23px 23px' }} />
+      <motion.div className="relative w-full max-w-[440px] min-h-[530px] sm:min-h-[580px] rounded-[28px] border border-[#D9E3FF] bg-white shadow-[0_24px_75px_rgba(25,68,241,.16)] flex flex-col overflow-hidden"
+        initial={{ opacity: 0, y: 20, scale: .97 }} animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: .5 }}>
         <div className="flex justify-between items-center px-6 pt-6">
-          <span className="text-[#1944F1] text-lg font-extrabold">Datespot 💙</span>
-          <button type="button" onClick={finish} className="text-xs font-bold text-[#52617E] px-3 py-2 rounded-lg hover:bg-[#F1F5FF]">Skip</button>
+          <span className="text-[#1944F1] text-xl font-extrabold">Datespot 💙</span>
+          <button type="button" onClick={finish} className="text-xs font-bold text-[#5F6C85] px-3 py-2 rounded-lg hover:bg-[#F1F5FF]">
+            Skip
+          </button>
         </div>
-        <div className="flex-1 flex flex-col items-center justify-center text-center px-7 py-5">
+        <div className="flex-1 flex flex-col justify-center px-7 py-6 text-center" aria-live="polite">
           <AnimatePresence mode="wait">
             <motion.div key={step} className="flex flex-col items-center w-full"
-              initial={{ opacity: 0, x: 45, scale: .94 }} animate={{ opacity: 1, x: 0, scale: 1 }}
-              exit={{ opacity: 0, x: -45, scale: .96 }} transition={{ duration: .45, ease: 'easeOut' }}>
-              <motion.div className="w-36 h-36 sm:w-40 sm:h-40 rounded-[40px] flex items-center justify-center mb-8 shadow-inner"
-                style={{ background: scene.color }}
-                animate={{ y: [0, -9, 0], rotate: [-3, 3, -3] }}
-                transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}>
-                <span className="text-[78px] leading-none" role="img" aria-label="Scene illustration">{scene.emoji}</span>
-              </motion.div>
-              <h2 className="text-[25px] sm:text-[29px] font-black leading-tight text-[#0E1B3C] mb-4">{scene.title}</h2>
-              <p className="text-[15px] leading-relaxed font-medium text-[#64718D]">{scene.detail}</p>
+              initial={{ opacity: 0, x: 65, scale: .93 }}
+              animate={{ opacity: 1, x: 0, scale: 1 }}
+              exit={{ opacity: 0, x: -65, scale: .93 }}
+              transition={{ duration: .5, ease: [0.22, 1, 0.36, 1] }}>
+              <div className="w-48 h-48 relative flex items-center justify-center mb-8">
+                <motion.div className="absolute inset-3 rounded-full"
+                  style={{ background: scene.color }}
+                  animate={{ scale: [1, 1.1, 1], rotate: [-5, 5, -5] }}
+                  transition={{ duration: 3.3, repeat: Infinity, ease: 'easeInOut' }} />
+                <motion.div className="relative z-10 text-[94px] leading-none select-none"
+                  animate={{ y: [0, -13, 0], rotate: [-5, 4, -5] }}
+                  transition={{ duration: 2.8, repeat: Infinity, ease: 'easeInOut' }}
+                  role="img" aria-label="Illustration">{scene.emoji}</motion.div>
+                <motion.span className="absolute top-2 right-0 text-4xl select-none"
+                  animate={{ y: [0, -13, 0], rotate: [0, 16, 0] }}
+                  transition={{ duration: 2.2, repeat: Infinity }}>{scene.side[0]}</motion.span>
+                <motion.span className="absolute bottom-4 left-0 text-4xl select-none"
+                  animate={{ y: [0, 9, 0], rotate: [0, -14, 0] }}
+                  transition={{ duration: 2.6, repeat: Infinity }}>{scene.side[1]}</motion.span>
+              </div>
+              <h1 className="text-[23px] sm:text-[28px] leading-[1.25] font-black tracking-tight text-[#101E40]">{scene.title}</h1>
+              {scene.detail && <motion.p className="mt-5 text-[16px] font-bold leading-relaxed text-[#1944F1]"
+                initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: .45, duration: .45 }}>{scene.detail}</motion.p>}
             </motion.div>
           </AnimatePresence>
         </div>
         <div className="px-6 pb-7">
-          <div className="flex justify-center gap-2 mb-5" aria-label={`Slide ${step + 1} of ${INTRO_SCENES.length}`}>
-            {INTRO_SCENES.map((_, i) => (
-              <button type="button" key={i} onClick={() => { setStep(i); setPaused(true); }}
-                aria-label={`Go to slide ${i + 1}`}
-                className="h-2 rounded-full transition-all duration-300"
-                style={{ width: i === step ? 28 : 8, background: i === step ? '#1944F1' : '#CBD5E8' }} />
+          <div className="flex gap-1.5 mb-5" aria-label={`Slide ${step + 1} of ${INTRO_SCENES.length}`}>
+            {INTRO_SCENES.map((item, i) => (
+              <button type="button" key={i} onClick={() => setStep(i)}
+                aria-label={`Go to scene ${i + 1}`}
+                className="flex-1 h-[5px] rounded-full overflow-hidden bg-[#E0E7F6]">
+                {i < step ? <span className="block w-full h-full bg-[#1944F1]" /> : i === step ? (
+                  <motion.span key={step} className="block h-full bg-[#1944F1]" initial={{ width: '0%' }}
+                    animate={{ width: '100%' }}
+                    transition={{ duration: item.duration ? item.duration / 1000 : .5, ease: 'linear' }} />
+                ) : null}
+              </button>
             ))}
           </div>
-          <button type="button" onClick={() => step === INTRO_SCENES.length - 1 ? finish() : (setStep(i => i + 1), setPaused(true))}
+          <button type="button" onClick={() => step === INTRO_SCENES.length - 1 ? finish() : setStep(step + 1)}
             className="w-full rounded-2xl py-4 text-white font-extrabold text-base flex justify-center items-center gap-2 active:scale-[.98] transition-transform"
-            style={{ background: '#1944F1', boxShadow: '0 8px 24px rgba(25,68,241,.22)' }}>
+            style={{ background: '#1944F1', boxShadow: '0 8px 24px rgba(25,68,241,.23)' }}>
             {step === INTRO_SCENES.length - 1 ? 'Try Now' : 'Next'} <ArrowRight className="w-5 h-5" />
           </button>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </main>
   );
 }
 
@@ -988,7 +1053,7 @@ export default function App() {
   }, []);
 
   const [entered, setEntered] = useState(() => localStorage.getItem('ds_lead_submitted') === '1');
-  const [showIntro, setShowIntro] = useState(false);
+  const [showIntro, setShowIntro] = useState(() => new URLSearchParams(window.location.search).get('intro') === '1');
   if (!entered) {
     return (
       <ThemeProvider>
