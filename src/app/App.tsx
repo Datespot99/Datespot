@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { SHEET_URL, SlotsProvider, useSlots, waitForScreenshotReceipt } from './slots';
+import { SHEET_URL, SlotsProvider, useSlots } from './slots';
 
 import { motion, AnimatePresence } from 'motion/react';
 import {
@@ -1531,7 +1531,7 @@ function VoiceMessageBubble({ audioSrc, isUser }: { audioSrc?: string; isUser?: 
 type UploadState = 'idle' | 'verifying' | 'details' | 'saving' | 'success';
 
 function PaymentModal({ onClose, paymentType, device }: { onClose: () => void; paymentType: 'full' | 'demo'; device: PricingDevice }) {
-  const { isLive, refresh, setConfirmedSlots } = useSlots();
+  const { isLive, refresh } = useSlots();
   const UPI_ID        = 'BHARATPE2R0S0C1D6V46619@unitype';
   const { amount: AMOUNT } = PRICING[device];
   const TELEGRAM_LINK = 'https://t.me/+CgjgUjhztc1lNDdl';
@@ -1561,7 +1561,7 @@ function PaymentModal({ onClose, paymentType, device }: { onClose: () => void; p
       toast.error('Please choose an image screenshot.');
       return;
     }
-    // Check the image locally before uploading it during signup.
+    // Inspect the screenshot locally only; the image never leaves the device.
     setUploadState('verifying');
     try {
       await createImageBitmap(file).then(bitmap => bitmap.close());
@@ -1580,54 +1580,32 @@ function PaymentModal({ onClose, paymentType, device }: { onClose: () => void; p
     const phone = leadPhone.replace(/\D/g, '').replace(/^91(?=\d{10}$)/, '');
     if (name.length < 2) { setLeadError('Enter your name.'); return; }
     if (!/^[6-9]\d{9}$/.test(phone)) { setLeadError('Enter a valid 10-digit Indian mobile number.'); return; }
-    if (!LEADS_WEB_APP_URL || !screenshotRef.current) {
+    if (!screenshotRef.current) {
       setLeadError('Please select a payment screenshot first.');
       return;
     }
+
+    // The screenshot was checked locally on selection. Do not upload or store
+    // the image or claim that a payment has been verified.
     setLeadError('');
     setUploadState('saving');
     try {
-      // Compress and convert the chosen image to JPEG to stay within Apps Script limits.
-      const bitmap = await createImageBitmap(screenshotRef.current);
-      const canvas = document.createElement('canvas');
-      const scale = Math.min(1, 1400 / Math.max(bitmap.width, bitmap.height));
-      canvas.width = Math.max(1, Math.round(bitmap.width * scale));
-      canvas.height = Math.max(1, Math.round(bitmap.height * scale));
-      const context = canvas.getContext('2d');
-      if (!context) throw new Error('Unable to process screenshot');
-      context.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
-      bitmap.close();
-      let blob: Blob | null = null;
-      for (const quality of [0.85, 0.7, 0.5, 0.35]) {
-        blob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, 'image/jpeg', quality));
-        if (blob && blob.size <= 1900000) break;
+      if (LEADS_WEB_APP_URL) {
+        // The existing doGet lead handler accepts name and phone. This request
+        // contains no image data; its opaque result cannot prove a Sheet write.
+        const url = new URL(LEADS_WEB_APP_URL);
+        url.searchParams.set('name', name);
+        url.searchParams.set('phone', phone);
+        await fetch(url.toString(), { method: 'GET', mode: 'no-cors', cache: 'no-store' });
       }
-      if (!blob || blob.size > 1900000) throw new Error('Image is too large. Please choose a smaller screenshot.');
-      const dataUrl = await new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(String(reader.result));
-        reader.onerror = () => reject(new Error('Could not read screenshot'));
-        reader.readAsDataURL(blob);
-      });
-      const uploadId = crypto.randomUUID();
-      const payload = JSON.stringify({
-        action: 'screenshot', uploadId, name, phone, mimeType: 'image/jpeg',
-        image: dataUrl.slice(dataUrl.indexOf(',') + 1),
-      });
-      // Apps Script's response is opaque. Only the server receipt confirms storage.
-      await fetch(LEADS_WEB_APP_URL, {
-        method: 'POST', mode: 'no-cors',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: payload,
-      });
-      const remaining = await waitForScreenshotReceipt(uploadId);
-      setConfirmedSlots(remaining);
-      setUploadState('success');
-      window.setTimeout(() => window.location.assign(TELEGRAM_LINK), 900);
     } catch (error) {
-      setUploadState('details');
-      setLeadError(error instanceof Error ? error.message : 'Screenshot upload failed. Please retry.');
+      // Lead capture is best effort; do not block the original Telegram flow.
+      console.warn('Lead submission request failed', error);
     }
+    window.setTimeout(() => {
+      setUploadState('success');
+      window.setTimeout(() => window.location.assign(TELEGRAM_LINK), 1200);
+    }, 1500);
   };
 
   return (
@@ -1765,26 +1743,26 @@ function PaymentModal({ onClose, paymentType, device }: { onClose: () => void; p
               <button type="submit" className="w-full py-3 rounded-xl text-white text-sm font-bold flex items-center justify-center gap-2" style={{ background: B1 }}>
                 Continue to Telegram <ArrowRight className="w-4 h-4" />
               </button>
-              <p className="text-[10px] text-center text-gray-500">Your screenshot will be saved privately with your details. Payment is not automatically verified.</p>
+              <p className="text-[10px] text-center text-gray-500">Screenshot checked on this device only; it won't be uploaded. Payment is not verified.</p>
               {!LEADS_WEB_APP_URL && <a className="block text-center text-xs font-bold" style={{ color: B1 }} href="https://t.me/subhash8055g" target="_blank" rel="noopener noreferrer">Contact Telegram support</a>}
             </form>
           )}
           {uploadState === 'saving' && (
             <div className="text-center py-8" role="status">
               <Loader2 className="w-9 h-9 animate-spin mx-auto mb-3" style={{ color: B1 }} />
-              <p className="font-bold text-gray-900">Submitting your details...</p>
+              <p className="font-bold text-gray-900">Checking your details...</p>
               <p className="text-xs text-gray-500 mt-1">Please don't close this page</p>
             </div>
           )}
           {uploadState === 'success' && (
             <div className="text-center py-7" role="status">
               <CheckCircle className="w-10 h-10 mx-auto mb-3" style={{ color: B1 }} />
-              <p className="font-bold text-gray-900">Details sent. Opening Telegram...</p>
+              <p className="font-bold text-gray-900">Screenshot selected. Opening Telegram...</p>
               <p className="text-xs text-gray-500 mt-1 mb-4">If Telegram doesn't open, use the button below.</p>
               <a href={TELEGRAM_LINK} className="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-white font-bold text-sm" style={{ background: B1 }}>
                 <Send className="w-4 h-4" /> Open Telegram Group <ExternalLink className="w-3.5 h-3.5" />
               </a>
-              <p className="text-[10px] text-gray-500 mt-3">Screenshot saved. Payment is not independently verified.</p>
+              <p className="text-[10px] text-gray-500 mt-3">Screenshot was not uploaded or stored. Payment has not been verified.</p>
             </div>
           )}
 
