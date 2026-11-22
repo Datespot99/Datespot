@@ -1,7 +1,7 @@
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 
 // Same deployed Apps Script endpoint used by lead and screenshot submissions.
-export const SHEET_URL = 'https://script.google.com/macros/s/AKfycbz_tLVlDU-Vsgu2xQtBtpdfpzXYukEdalfGFRWXQ4d1TUkC4Lk8kUSox0F0jOCWHLNzbw/exec'; // Requires full screenshot-capable Code.gs deployment.
+export const SHEET_URL = 'https://script.google.com/macros/s/AKfycbyNdvIiiSQWSB_qoFsvaV_zDAUxqhgshs0SGKnh0mGOn2wFGkYXcTKExXx5rLmx160W9w/exec'; // Requires full screenshot-capable Code.gs deployment.
 
 type SlotReply = { slots?: number; status?: 'saved' | 'error' | 'pending'; message?: string };
 type SlotContextValue = {
