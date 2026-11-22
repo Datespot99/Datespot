@@ -1,16 +1,19 @@
-# Deploy Datespot to the new Leads spreadsheet
+# Fresh Datespot Google Sheets connection
 
-The website and Apps Script are separate deployments. **Do not merge the frontend URL change until the script is deployed and tested.**
+New destination: https://docs.google.com/spreadsheets/d/15GfFqb3MHWjfiqDX9vDyJrm6wX1kqAMFkZR04WNp4iM/edit
 
-1. Open the **new** Google Sheet, then Extensions → Apps Script (the script must be bound to that spreadsheet).
-2. Replace Code.gs with the contents of this repository's `google-apps-script/Code.gs` from this branch. The prior lead-only script does not support screenshots or slots.
-3. Save and run `authorizeScreenshotStorage` once to grant Drive access.
-4. Deploy → Manage deployments → Edit the existing web app ending `...PoTS7/exec` → New version → Deploy. Execute as **Me**, access **Anyone**. Keep the same /exec URL.
-5. Test `?action=slots&callback=dsCheck` on the /exec URL. It should return a JavaScript callback with a slots count. Then submit a test signup and screenshot, verify a single row in the **Leads** tab (A date, B name, C phone, F screenshot link) and verify the slots count decreases once. Test duplicate receipt and duplicate phone.
-6. Only after successful backend testing, merge the PR to deploy the frontend's new endpoint.
+The **Leads** tab contains: Date, Full Name, Phone Number, Status, Notes, Payment Screenshot.
+The new version saves the screenshot privately in Google Drive, creates the lead, and deducts one of 26 slots per unique phone. A screenshot upload counts as a joining; payment status is **not** verified.
 
-**Important:** The new Apps Script project has fresh Script Properties, so the slots counter starts at `INITIAL_SLOTS = 26` unless you manually migrate the previous remaining count and per-phone join markers. For an ongoing campaign, migrate those properties before launch to avoid resetting counts. Do not reset `ds_remaining_slots_v1` after deployment.
+## Deploy before merging the website change
 
-The screenshot is stored in a private Google Drive folder. The saved screenshot is **not** verification of payment.
+1. Open https://script.google.com and create a **new Apps Script project** (or use the fresh spreadsheet's **Extensions > Apps Script**).
+2. Paste `google-apps-script/Code.gs` into `Code.gs` and save. It is preconfigured for the fresh spreadsheet ID above; authorize access as the spreadsheet owner.
+3. Run `authorizeScreenshotStorage` once and grant Google Sheets and Drive permissions. Ensure the project owner can edit the destination spreadsheet.
+4. Deploy > **New deployment** > **Web app**. Execute as **Me**; Who has access **Anyone**. Copy the new `/exec` URL.
+5. In `src/app/slots.tsx`, replace the `SHEET_URL` with **that new deployment URL**. The payment form imports this same URL; do not use separate endpoints.
+6. Check `/exec?action=slots&callback=dsCheck` returns `dsCheck({"slots":26});` before switching traffic.
+7. Test a real signup from a preview build: select an image, submit a new name/phone, confirm one `Leads` row with the screenshot hyperlink in column F and slots = 25. Retry the **same phone** to confirm it does not reduce again.
+8. After those backend tests pass, merge the pull request. A GitHub commit **does not** deploy Google Apps Script.
 
-This code assumes the new spreadsheet is clean and the Leads tab is dedicated to the automated leads. It finds the next row based on the last name/phone rather than prefilled dates. Do not add date-only rows to the Leads tab.
+**Do not merge without deploying and verifying the Apps Script**, or registration will fail. Do not publish a screenshot folder or personal details publicly. Existing leads and screenshot links are untouched in the old spreadsheets. The new counter starts from 26; migrate old join counts manually if the 26 is not the true current remaining count.
