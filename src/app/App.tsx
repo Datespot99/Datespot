@@ -1535,13 +1535,14 @@ function PaymentModal({ onClose, paymentType, device }: { onClose: () => void; p
   const UPI_ID        = 'BHARATPE2R0S0C1D6V46619@unitype';
   const { amount: AMOUNT } = PRICING[device];
   const TELEGRAM_LINK = 'https://t.me/+CgjgUjhztc1lNDdl';
-  // Google Apps Script endpoint for post-screenshot name and phone submission.
-  const LEADS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbztOjvcCS6DkHxQvYadZQhStbwwXTYwQICgONaFxrpPqAvoP4_WpLuzmwz4thTSoqRAug/exec';
+  // All lead, screenshot and slot operations use the shared Apps Script URL.
+  const LEADS_WEB_APP_URL = SHEET_URL;
   const upiUrl        = `upi://pay?pa=${UPI_ID}&pn=Datespot&am=${AMOUNT}&cu=INR`;
 
   const [uploadState, setUploadState] = useState<UploadState>('idle');
   const [leadName, setLeadName] = useState('');
   const [leadPhone, setLeadPhone] = useState('');
+  const screenshotRef = useRef<File | null>(null);
   const [leadError, setLeadError] = useState('');
   const [tab, setTab] = useState<'qr' | 'upi'>('qr');
   // A compact one-minute countdown, without implying the payment price expires.
@@ -1560,10 +1561,11 @@ function PaymentModal({ onClose, paymentType, device }: { onClose: () => void; p
       toast.error('Please choose an image screenshot.');
       return;
     }
-    // The screenshot is inspected locally only; it is not uploaded, stored or verified as payment.
+    // Check the image locally before uploading it during signup.
     setUploadState('verifying');
     try {
       await createImageBitmap(file).then(bitmap => bitmap.close());
+      screenshotRef.current = file;
       setLeadError('');
       setUploadState('details');
     } catch {
@@ -1578,25 +1580,53 @@ function PaymentModal({ onClose, paymentType, device }: { onClose: () => void; p
     const phone = leadPhone.replace(/\D/g, '').replace(/^91(?=\d{10}$)/, '');
     if (name.length < 2) { setLeadError('Enter your name.'); return; }
     if (!/^[6-9]\d{9}$/.test(phone)) { setLeadError('Enter a valid 10-digit Indian mobile number.'); return; }
-    if (!LEADS_WEB_APP_URL) {
-      setLeadError('Registration is temporarily unavailable. Please contact Telegram support.');
+    if (!LEADS_WEB_APP_URL || !screenshotRef.current) {
+      setLeadError('Please select a payment screenshot first.');
       return;
     }
     setLeadError('');
     setUploadState('saving');
     try {
-      const params = new URLSearchParams({
-        name, phone, amount: AMOUNT,
-        source: device, screenshotSelected: 'Yes',
+      // Compress and convert the chosen image to JPEG to stay within Apps Script limits.
+      const bitmap = await createImageBitmap(screenshotRef.current);
+      const canvas = document.createElement('canvas');
+      const scale = Math.min(1, 1400 / Math.max(bitmap.width, bitmap.height));
+      canvas.width = Math.max(1, Math.round(bitmap.width * scale));
+      canvas.height = Math.max(1, Math.round(bitmap.height * scale));
+      const context = canvas.getContext('2d');
+      if (!context) throw new Error('Unable to process screenshot');
+      context.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+      bitmap.close();
+      let blob: Blob | null = null;
+      for (const quality of [0.85, 0.7, 0.5, 0.35]) {
+        blob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, 'image/jpeg', quality));
+        if (blob && blob.size <= 1900000) break;
+      }
+      if (!blob || blob.size > 1900000) throw new Error('Image is too large. Please choose a smaller screenshot.');
+      const dataUrl = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result));
+        reader.onerror = () => reject(new Error('Could not read screenshot'));
+        reader.readAsDataURL(blob);
       });
-      // Apps Script web apps require an opaque no-cors POST from the browser.
-      // A completed fetch does not confirm the sheet write or payment.
-      await fetch(LEADS_WEB_APP_URL, { method: 'POST', mode: 'no-cors', body: params });
+      const uploadId = crypto.randomUUID();
+      const payload = JSON.stringify({
+        action: 'screenshot', uploadId, name, phone, mimeType: 'image/jpeg',
+        image: dataUrl.slice(dataUrl.indexOf(',') + 1),
+      });
+      // Apps Script's response is opaque. Only the server receipt confirms storage.
+      await fetch(LEADS_WEB_APP_URL, {
+        method: 'POST', mode: 'no-cors',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: payload,
+      });
+      const remaining = await waitForScreenshotReceipt(uploadId);
+      setConfirmedSlots(remaining);
       setUploadState('success');
       window.setTimeout(() => window.location.assign(TELEGRAM_LINK), 900);
-    } catch {
+    } catch (error) {
       setUploadState('details');
-      setLeadError('Could not submit your details. Please check your connection and retry.');
+      setLeadError(error instanceof Error ? error.message : 'Screenshot upload failed. Please retry.');
     }
   };
 
@@ -1735,7 +1765,7 @@ function PaymentModal({ onClose, paymentType, device }: { onClose: () => void; p
               <button type="submit" className="w-full py-3 rounded-xl text-white text-sm font-bold flex items-center justify-center gap-2" style={{ background: B1 }}>
                 Continue to Telegram <ArrowRight className="w-4 h-4" />
               </button>
-              <p className="text-[10px] text-center text-gray-500">Your details will be submitted for group access. Payment is not automatically verified. The screenshot is not stored.</p>
+              <p className="text-[10px] text-center text-gray-500">Your screenshot will be saved privately with your details. Payment is not automatically verified.</p>
               {!LEADS_WEB_APP_URL && <a className="block text-center text-xs font-bold" style={{ color: B1 }} href="https://t.me/subhash8055g" target="_blank" rel="noopener noreferrer">Contact Telegram support</a>}
             </form>
           )}
@@ -1754,7 +1784,7 @@ function PaymentModal({ onClose, paymentType, device }: { onClose: () => void; p
               <a href={TELEGRAM_LINK} className="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-white font-bold text-sm" style={{ background: B1 }}>
                 <Send className="w-4 h-4" /> Open Telegram Group <ExternalLink className="w-3.5 h-3.5" />
               </a>
-              <p className="text-[10px] text-gray-500 mt-3">Screenshot is not uploaded or stored. Submission and payment are not independently verified.</p>
+              <p className="text-[10px] text-gray-500 mt-3">Screenshot saved. Payment is not independently verified.</p>
             </div>
           )}
 
