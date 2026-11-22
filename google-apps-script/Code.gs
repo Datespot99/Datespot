@@ -5,7 +5,8 @@
  * Deploy as Apps Script Web App: Execute as Me; Who has access: Anyone.
  * Run authorizeScreenshotStorage in the editor once to authorize Drive access.
  */
-// This Apps Script must be bound to the NEW Datespot Leads spreadsheet.
+// Fresh Datespot Leads spreadsheet. Deploy this script as a Web App before switching the frontend.
+const SPREADSHEET_ID = '15GfFqb3MHWjfiqDX9vDyJrm6wX1kqAMFkZR04WNp4iM';
 const SHEET_NAME = 'Leads';
 const TIME_ZONE = 'Asia/Kolkata';
 const MAX_IMAGE_BYTES = 1900000;
@@ -79,8 +80,14 @@ function doPost(e) {
     const receiptKey = RECEIPT_PREFIX + id;
     if (props.getProperty(receiptKey) === 'saved') return reply_('OK');
     const sheet = sheet_();
-    const row = matchingRow_(sheet, name, phone);
-    if (row < 2) return rejectUpload_(id, 'No matching signup');
+    // A successful screenshot submission is itself a signup; no separate lead request.
+    let row = matchingRow_(sheet, name, phone);
+    if (row < 2) {
+      row = nextLeadRow_(sheet);
+      const dateTime = Utilities.formatDate(new Date(), TIME_ZONE, 'dd-MM hh:mma');
+      sheet.getRange(row, 1, 1, 3).setNumberFormat('@').setValues([[dateTime, safe_(name), phone]]);
+      sheet.getRange(row, 1, 1, 6).setVerticalAlignment('middle');
+    }
     const cell = sheet.getRange(row, 6);
 
     // The same screenshot row cannot be used twice to claim a slot.
@@ -233,8 +240,7 @@ function safe_(value) {
 }
 
 function sheet_() {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  if (!ss) throw new Error('Bind this script to the new Google Sheet using Extensions > Apps Script');
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
   let sheet = ss.getSheetByName(SHEET_NAME);
   if (!sheet) sheet = ss.insertSheet(SHEET_NAME);
   if (sheet.getLastRow() === 0) {
