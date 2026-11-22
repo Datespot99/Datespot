@@ -75,57 +75,73 @@ function doPost(e) {
   // Serialize uploads, retries and count updates across all visitors.
   const lock = LockService.getScriptLock();
   lock.waitLock(20000);
+  let stage = 'sheet access';
   try {
     const props = PropertiesService.getScriptProperties();
     const receiptKey = RECEIPT_PREFIX + id;
     if (props.getProperty(receiptKey) === 'saved') return reply_('OK');
     const sheet = sheet_();
-    // A successful screenshot submission is itself a signup; no separate lead request.
     let row = matchingRow_(sheet, name, phone);
-    if (row < 2) {
-      row = nextLeadRow_(sheet);
-      const dateTime = Utilities.formatDate(new Date(), TIME_ZONE, 'dd-MM hh:mma');
-      sheet.getRange(row, 1, 1, 3).setNumberFormat('@').setValues([[dateTime, safe_(name), phone]]);
-      sheet.getRange(row, 1, 1, 6).setVerticalAlignment('middle');
-    }
-    const cell = sheet.getRange(row, 6);
-
-    // The same screenshot row cannot be used twice to claim a slot.
-    if (cell.getDisplayValue() === 'View Screenshot') {
-      props.setProperty(receiptKey, 'saved');
+    if (row >= 2 && sheet.getRange(row, 6).getDisplayValue() === 'View Screenshot') {
+      stage = 'slot confirmation';
+      confirmJoining_(props, phone, receiptKey);
       return reply_('OK');
     }
 
+    stage = 'Drive screenshot storage';
     const timestamp = Utilities.formatDate(new Date(), TIME_ZONE, 'yyyyMMdd_HHmmss');
-    const filename = 'datespot_payment_' + timestamp + '_row_' + row + '.jpg';
+    const filename = 'datespot_payment_' + timestamp + '_' + id + '.jpg';
     const blob = Utilities.newBlob(bytes, 'image/jpeg', filename);
     const file = getProofFolder_().createFile(blob);
     const fileUrl = file.getUrl();
+
+    stage = 'Sheets registration';
+    if (row < 2) {
+      row = nextLeadRow_(sheet);
+      const dateTime = Utilities.formatDate(new Date(), TIME_ZONE, 'dd-MM hh:mma');
+      sheet.getRange(row, 1, 1, 3).setNumberFormat('@')
+        .setValues([[dateTime, safe_(name), phone]]);
+      sheet.getRange(row, 1, 1, 6).setVerticalAlignment('middle');
+    }
+    const cell = sheet.getRange(row, 6);
     setScreenshotLink_(cell, fileUrl);
     cell.setNote('Private screenshot: ' + fileUrl);
     sheet.setRowHeight(row, 32);
-    sheet.getImages().filter(img => {
-      const anchor = img.getAnchorCell();
-      return anchor.getRow() === row && anchor.getColumn() === 6;
-    }).forEach(img => img.remove());
     SpreadsheetApp.flush();
 
-    // Only after successful Drive storage + sheet link, count one new
-    // joining per phone. A repeat receipt, signup or re-upload does not
-    // take another slot. The count cannot go below zero.
-    const joinedKey = JOIN_PREFIX + phoneHash_(phone);
-    const updates = {};
-    updates[receiptKey] = 'saved';
-    if (!props.getProperty(joinedKey)) {
-      updates[joinedKey] = '1';
-      updates[SLOTS_PROPERTY] = String(Math.max(0, remainingSlots_() - 1));
-    }
-    props.setProperties(updates, false);
+    stage = 'slot confirmation';
+    confirmJoining_(props, phone, receiptKey);
     return reply_('OK');
   } catch (err) {
-    console.error('Screenshot upload error: ' + err);
-    return rejectUpload_(id, 'Upload failed. Please retry.');
+    console.error('Datespot upload failed at ' + stage + ': ' + (err && err.stack ? err.stack : err));
+    return rejectUpload_(id, 'Upload failed during ' + stage + '. Please retry.');
   } finally { lock.releaseLock(); }
+}
+
+// Mark one joining per phone and avoid duplicate slot deductions on retries.
+function confirmJoining_(props, phone, receiptKey) {
+  const joinedKey = JOIN_PREFIX + phoneHash_(phone);
+  if (!props.getProperty(joinedKey)) {
+    const updates = {};
+    updates[joinedKey] = '1';
+    updates[SLOTS_PROPERTY] = String(Math.max(0, remainingSlots_() - 1));
+    props.setProperties(updates, false);
+  }
+  props.setProperty(receiptKey, 'saved');
+}
+
+// Run manually to check Sheets and Drive permissions without creating leads.
+function testStorageAccess() {
+  const sheet = sheet_();
+  const folder = getProofFolder_();
+  const result = {
+    spreadsheet: SpreadsheetApp.openById(SPREADSHEET_ID).getName(),
+    tab: sheet.getName(),
+    folder: folder.getName(),
+    slots: remainingSlots_(),
+  };
+  console.log(JSON.stringify(result));
+  return result;
 }
 
 function validReceiptId_(id) {
