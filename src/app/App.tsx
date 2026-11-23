@@ -35,8 +35,8 @@ const HERO_GRAD = B1;
 
 // Shared one-time price for desktop, mobile and UPI payments.
 const PRICING = {
-  desktop: { amount: '499' },
-  mobile:  { amount: '499' },
+  desktop: { amount: '899', original: '1999' },
+  mobile:  { amount: '899', original: '1999' },
 } as const;
 type PricingDevice = keyof typeof PRICING;
 const formatPrice = (value: string) => `₹${Number(value).toLocaleString('en-IN')}`;
@@ -794,6 +794,7 @@ function StickyCTA({ onJoin }: { onJoin: () => void }) {
               style={{ background: 'rgba(255,255,255,0.14)', width: '60%' }} />
             <div className="relative flex items-center justify-center gap-2 py-3.5 px-3 whitespace-nowrap">
               <span className="font-extrabold text-white text-[clamp(11px,3.3vw,15px)] tracking-tight shrink-0">Try Now for just {formatPrice(PRICING.mobile.amount)}</span>
+              <span className="text-white/70 text-[11px] line-through shrink-0">{formatPrice(PRICING.mobile.original)}</span>
               <ArrowRight className="w-4 h-4 text-white shrink-0" />
             </div>
           </motion.button>
@@ -844,6 +845,7 @@ function MobileApp() {
                 <span className="text-xs font-bold" style={{ color: T.MUTED }}>Try Now for just</span>
                 <div className="flex items-baseline gap-2 justify-center">
                 <span className="font-black text-4xl leading-none" style={{ color: B1 }}>{formatPrice(PRICING.mobile.amount)}</span>
+                <span className="text-base font-bold line-through" style={{ color: T.MUTED }}>{formatPrice(PRICING.mobile.original)}</span>
                 </div>
               </div>
 
@@ -1238,6 +1240,7 @@ function DesktopVersion({ onOpenPayment, showPayment, onClosePayment, paymentTyp
         <h2 className="font-black text-4xl mb-2" style={{ color: T.DARK, letterSpacing: '-0.04em' }}>Ready to Join?</h2>
         <div className="flex items-baseline gap-3 justify-center mb-5">
           <span className="font-black text-5xl leading-none" style={{ color: B1 }}>{formatPrice(PRICING.desktop.amount)}</span>
+          <span className="text-xl font-bold line-through" style={{ color: T.MUTED }}>{formatPrice(PRICING.desktop.original)}</span>
         </div>
         <button type="button" onClick={() => onOpenPayment('full')}
           className="w-full max-w-[360px] rounded-2xl font-extrabold text-white text-base inline-flex items-center justify-center gap-3 px-10 py-4 transition-transform hover:scale-[1.02] active:scale-[.98]"
@@ -1427,7 +1430,7 @@ function ChatOverlay({ onClose, onOpenPayment }: { onClose: () => void; onOpenPa
                   <button onClick={() => { toast.success('Opening payment...'); onClose(); setTimeout(() => onOpenPayment(), 300); }}
                     className="px-5 py-2.5 rounded-2xl text-white font-bold text-xs active:scale-95 transition-transform shadow-md"
                     style={{ background: HERO_GRAD }}>
-                    Try Now for just {formatPrice(PRICING.mobile.amount)}
+                    Try Now for just {formatPrice(PRICING.mobile.amount)} <span className="line-through opacity-70">{formatPrice(PRICING.mobile.original)}</span>
                   </button>
                 ) : (
                   <div className="px-3.5 py-2.5 text-xs shadow-sm"
@@ -1533,7 +1536,7 @@ type UploadState = 'idle' | 'verifying' | 'details' | 'saving' | 'success';
 function PaymentModal({ onClose, paymentType, device }: { onClose: () => void; paymentType: 'full' | 'demo'; device: PricingDevice }) {
   const { isLive, refresh } = useSlots();
   const UPI_ID        = 'BHARATPE2R0S0C1D6V46619@unitype';
-  const { amount: AMOUNT } = PRICING[device];
+  const { amount: AMOUNT, original: ORIGINAL_AMOUNT } = PRICING[device];
   const TELEGRAM_LINK = 'https://t.me/+CgjgUjhztc1lNDdl';
   // All lead, screenshot and slot operations use the shared Apps Script URL.
   const LEADS_WEB_APP_URL = SHEET_URL;
@@ -1631,6 +1634,7 @@ function PaymentModal({ onClose, paymentType, device }: { onClose: () => void; p
           </div>
           <div className="text-right shrink-0 mr-7">
             <div className="font-extrabold text-2xl leading-none" style={{ color: B1 }}>{formatPrice(AMOUNT)}</div>
+            <div className="text-[11px] text-gray-400 line-through font-semibold">{formatPrice(ORIGINAL_AMOUNT)}</div>
           </div>
         </div>
 
