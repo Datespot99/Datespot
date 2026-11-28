@@ -9,6 +9,9 @@
     "ignoreReducedMotion": false
   },
   "icons": {
-    "icon": "/datespot-logo.svg"
+    "icon": "/datespot-logo.webp"
+  },
+  "openGraph": {
+    "image": "/datespot-logo.webp"
   }
 }

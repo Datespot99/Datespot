@@ -1626,7 +1626,7 @@ function PaymentModal({ onClose, paymentType, device }: { onClose: () => void; p
 
         {/* Header */}
         <div className="px-4 pt-3 pb-2 flex items-center gap-2.5">
-          <img src="/datespot-logo.svg" alt="Datespot logo"
+          <img src="/datespot-logo.webp" alt="Datespot mascot logo"
             className="w-8 h-8 rounded-lg shrink-0 object-cover" />
           <div className="flex-1 min-w-0">
             <div className="font-bold text-sm leading-none text-gray-900">Join Datespot</div>
