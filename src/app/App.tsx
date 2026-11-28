@@ -1664,17 +1664,7 @@ function PaymentModal({ onClose, paymentType, device }: { onClose: () => void; p
                 {tab === 'qr' ? (
                   <motion.div key="qr" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                     <div className="rounded-xl p-2 mb-1 flex items-center justify-center" style={{ background: '#F8FAFC' }}>
-                      <QRCodeSVG
-                        value={upiUrl}
-                        size={132}
-                        level="H"
-                        imageSettings={{
-                          src: '/datespot-logo.webp',
-                          height: 28,
-                          width: 28,
-                          excavate: true,
-                        }}
-                      />
+                      <QRCodeSVG value={upiUrl} size={132} level="H" />
                     </div>
                     <p className="text-center text-[10px] mb-1 font-medium" style={{ color: "#475569" }}>Scan with any UPI app</p>
                   </motion.div>
