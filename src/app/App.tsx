@@ -720,7 +720,6 @@ function FAQ() {
         style={{ background: T.isDark ? 'rgba(25,68,241,.10)' : '#F1F4FF', border: '1px solid rgba(25,68,241,.16)' }}>
         <div>
           <p className="text-[12px] font-extrabold" style={{ color: T.DARK }}>Need help before joining?</p>
-          <p className="text-[10px] mt-0.5" style={{ color: T.MUTED }}>Message @subhash8055g on Telegram</p>
         </div>
         <a href="https://t.me/subhash8055g" target="_blank" rel="noopener noreferrer"
           aria-label="Chat with Datespot support on Telegram before joining"
@@ -1341,7 +1340,7 @@ function DesktopVersion({ onOpenPayment, showPayment, onClosePayment, paymentTyp
           style={{ background: T.isDark ? 'rgba(25,68,241,.10)' : '#F1F4FF', border: '1px solid rgba(25,68,241,.16)' }}>
           <div>
             <h2 className="text-xl font-extrabold" style={{ color: T.DARK }}>Need help before joining?</h2>
-            <p className="text-sm mt-1" style={{ color: T.MUTED }}>Contact @subhash8055g directly on Telegram</p>
+            <p className="text-sm mt-1" style={{ color: T.MUTED }}>Reach out to our team directly on Telegram</p>
           </div>
           <a href="https://t.me/subhash8055g" target="_blank" rel="noopener noreferrer"
             aria-label="Contact Datespot support on Telegram"
@@ -1548,8 +1547,8 @@ function PaymentModal({ onClose, paymentType, device }: { onClose: () => void; p
   const screenshotRef = useRef<File | null>(null);
   const [leadError, setLeadError] = useState('');
   const [tab, setTab] = useState<'qr' | 'upi'>('qr');
-  // A compact one-minute countdown, without implying the payment price expires.
-  const [secondsLeft, setSecondsLeft] = useState(60);
+  // A compact two-minute countdown, without implying the payment price expires.
+  const [secondsLeft, setSecondsLeft] = useState(120);
   useEffect(() => {
     if (uploadState !== 'idle' || secondsLeft === 0) return;
     const id = window.setTimeout(() => setSecondsLeft(value => Math.max(0, value - 1)), 1000);
@@ -1665,7 +1664,17 @@ function PaymentModal({ onClose, paymentType, device }: { onClose: () => void; p
                 {tab === 'qr' ? (
                   <motion.div key="qr" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                     <div className="rounded-xl p-2 mb-1 flex items-center justify-center" style={{ background: '#F8FAFC' }}>
-                      <QRCodeSVG value={upiUrl} size={132} level="H" />
+                      <QRCodeSVG
+                        value={upiUrl}
+                        size={132}
+                        level="H"
+                        imageSettings={{
+                          src: '/datespot-logo.webp',
+                          height: 28,
+                          width: 28,
+                          excavate: true,
+                        }}
+                      />
                     </div>
                     <p className="text-center text-[10px] mb-1 font-medium" style={{ color: "#475569" }}>Scan with any UPI app</p>
                   </motion.div>
